@@ -27,6 +27,8 @@ class UserIndex extends Component
 
     public function toggleActive(int $userId): void
     {
+        abort_unless(auth('admin')->user()?->isSuperAdmin(), 403);
+
         $user = User::findOrFail($userId);
 
         if ($user->id === auth('admin')->id()) {
