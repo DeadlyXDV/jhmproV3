@@ -7,6 +7,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (DB::connection()->getDriverName() === 'sqlite') {
+            return;
+        }
+
         DB::statement("UPDATE bookings SET source = 'walk_in' WHERE source = 'manual'");
 
         DB::statement("ALTER TABLE bookings MODIFY COLUMN source
@@ -15,6 +19,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (DB::connection()->getDriverName() === 'sqlite') {
+            return;
+        }
+
         DB::statement("UPDATE bookings SET source = 'walk_in' WHERE source IN ('whatsapp','walk_in')");
 
         DB::statement("ALTER TABLE bookings MODIFY COLUMN source

@@ -7,16 +7,16 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
+        if (DB::connection()->getDriverName() === 'sqlite') {
+            return;
+        }
+
         Schema::table('work_orders', function (Blueprint $table) {
             $table->string('wo_number')->nullable()->unique()->after('id');
         });
 
-        // Generate wo_number untuk data lama yang sudah ada
         $workOrders = DB::table('work_orders')->orderBy('id')->get();
         foreach ($workOrders as $i => $wo) {
             $number = 'WO-'.str_pad($i + 1, 4, '0', STR_PAD_LEFT);
@@ -30,6 +30,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (DB::connection()->getDriverName() === 'sqlite') {
+            return;
+        }
+
         Schema::table('work_orders', function (Blueprint $table) {
             $table->dropColumn('wo_number');
         });

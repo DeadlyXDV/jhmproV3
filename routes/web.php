@@ -10,7 +10,9 @@ use App\Livewire\Admin\Dashboard\AdminDashboard;
 use App\Livewire\Admin\Invoices\InvoiceCreate;
 use App\Livewire\Admin\Invoices\InvoiceDetail;
 use App\Livewire\Admin\Invoices\InvoiceIndex;
+use App\Livewire\Admin\Orders\OrderIndex;
 use App\Livewire\Admin\Partners\PartnerIndex;
+use App\Livewire\Admin\Pos\PosPage;
 use App\Livewire\Admin\ProductBundles\ProductBundleIndex;
 use App\Livewire\Admin\Reports\ReportIndex;
 use App\Livewire\Admin\Rfm\RfmIndex;
@@ -57,6 +59,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/customers', CustomerIndex::class)->name('customers.index');
         Route::get('/customers/create', CustomerCreate::class)->name('customers.create');
         Route::get('/customers/{customer}', CustomerDetail::class)->name('customers.show');
+        Route::get('/customers/{customer}/edit', CustomerCreate::class)->name('customers.edit');
 
         // Kendaraan
         Route::get('/vehicles', VehicleIndex::class)->name('vehicles.index');
@@ -93,10 +96,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/stock-movements', StockMovementIndex::class)->name('stock-movements.index');
 
         // Online Shop
-        Route::get('/orders', \App\Livewire\Admin\Orders\OrderIndex::class)->name('orders.index');
+        Route::get('/orders', OrderIndex::class)->name('orders.index');
 
         // POS
-        Route::get('/pos', \App\Livewire\Admin\Pos\PosPage::class)->name('pos');
+        Route::get('/pos', PosPage::class)->name('pos');
     });
 
     // ── SUPER ADMIN ONLY ──────────────────────────────────────────────────────
