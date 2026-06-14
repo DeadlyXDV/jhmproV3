@@ -1,9 +1,22 @@
 <div>
+    {{-- Flash message --}}
+    @if(session('success'))
+    <div class="mb-4 px-4 py-3 bg-green-50 border border-green-200 text-green-700 text-sm rounded-lg flex items-center gap-2">
+        <x-heroicon-o-check-circle class="w-4 h-4 flex-shrink-0" />
+        {{ session('success') }}
+    </div>
+    @endif
+
     <div class="mb-6 flex items-center justify-between">
         <div>
             <h1 class="text-xl font-bold text-gray-900">Kendaraan</h1>
             <p class="text-sm text-gray-500 mt-0.5">Semua kendaraan terdaftar di bengkel</p>
         </div>
+        <a wire:navigate href="{{ route('admin.vehicles.create') }}"
+           class="flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
+            <x-heroicon-o-plus class="w-4 h-4" />
+            Tambah Kendaraan
+        </a>
     </div>
 
     <div class="bg-white rounded-xl shadow-sm overflow-hidden">
@@ -54,10 +67,16 @@
                     <td class="px-5 py-4 text-gray-600">{{ $vehicle->warna ?: '-' }}</td>
                     <td class="px-5 py-4 text-gray-700">{{ $vehicle->total_servis }}</td>
                     <td class="px-5 py-4">
-                        <a wire:navigate href="{{ route('admin.vehicles.show', $vehicle) }}"
-                           class="text-gray-400 hover:text-gray-700 transition">
-                            <x-heroicon-o-eye class="w-4 h-4" />
-                        </a>
+                        <div class="flex items-center gap-3">
+                            <a wire:navigate href="{{ route('admin.vehicles.show', $vehicle) }}"
+                               class="text-gray-400 hover:text-gray-700 transition">
+                                <x-heroicon-o-eye class="w-4 h-4" />
+                            </a>
+                            <a wire:navigate href="{{ route('admin.vehicles.edit', $vehicle) }}"
+                               class="text-gray-400 hover:text-blue-600 transition">
+                                <x-heroicon-o-pencil class="w-4 h-4" />
+                            </a>
+                        </div>
                     </td>
                 </tr>
                 @empty

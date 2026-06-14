@@ -22,6 +22,7 @@ use App\Livewire\Admin\SparepartCategories\SparepartCategoryIndex;
 use App\Livewire\Admin\Spareparts\SparepartIndex;
 use App\Livewire\Admin\StockMovements\StockMovementIndex;
 use App\Livewire\Admin\Users\UserIndex;
+use App\Livewire\Admin\Vehicles\VehicleCreate;
 use App\Livewire\Admin\Vehicles\VehicleDetail;
 use App\Livewire\Admin\Vehicles\VehicleIndex;
 use App\Livewire\Admin\WorkOrders\WorkOrderDetail;
@@ -63,7 +64,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Kendaraan
         Route::get('/vehicles', VehicleIndex::class)->name('vehicles.index');
+        Route::get('/vehicles/create', VehicleCreate::class)->name('vehicles.create');
         Route::get('/vehicles/{vehicle}', VehicleDetail::class)->name('vehicles.show');
+        Route::get('/vehicles/{vehicle}/edit', VehicleCreate::class)->name('vehicles.edit');
 
         // Partner
         Route::get('/partners', PartnerIndex::class)->name('partners.index');

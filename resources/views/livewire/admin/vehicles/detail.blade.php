@@ -24,6 +24,14 @@
         ];
     @endphp
 
+    {{-- Flash message --}}
+    @if(session('success'))
+    <div class="mb-4 px-4 py-3 bg-green-50 border border-green-200 text-green-700 text-sm rounded-lg flex items-center gap-2">
+        <x-heroicon-o-check-circle class="w-4 h-4 flex-shrink-0" />
+        {{ session('success') }}
+    </div>
+    @endif
+
     {{-- Breadcrumb --}}
     <div class="flex items-center gap-2 text-sm text-gray-500 mb-4">
         <a wire:navigate href="{{ route('admin.vehicles.index') }}" class="hover:text-gray-700">Kendaraan</a>
@@ -55,6 +63,11 @@
                 </p>
                 @endif
             </div>
+            <a wire:navigate href="{{ route('admin.vehicles.edit', $vehicle) }}"
+               class="flex items-center gap-1.5 text-sm text-gray-600 hover:text-blue-600 border border-gray-200 hover:border-blue-300 px-3 py-1.5 rounded-lg transition">
+                <x-heroicon-o-pencil class="w-4 h-4" />
+                Edit
+            </a>
         </div>
 
         <div class="grid grid-cols-3 gap-4 mt-5 pt-5 border-t border-gray-100">

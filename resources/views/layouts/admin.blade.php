@@ -38,25 +38,38 @@
         <nav class="flex-1 overflow-y-auto py-2 space-y-1 custom-scrollbar"
             :class="collapsed ? 'px-2' : 'px-4'">
 
-            @foreach([
-                'MENU' => [
-                    ['route' => 'admin.dashboard', 'icon' => 'o-home', 'label' => 'Dashboard', 'base' => 'admin.dashboard'],
-                    ['route' => 'admin.customers.index', 'icon' => 'o-users', 'label' => 'Pelanggan', 'base' => 'admin.customers'],
-                    ['route' => 'admin.vehicles.index', 'icon' => 'o-truck', 'label' => 'Kendaraan', 'base' => 'admin.vehicles'],
-                    ['route' => 'admin.invoices.index', 'icon' => 'o-document-text', 'label' => 'Invoice', 'base' => 'admin.invoices'],
-                    ['route' => 'admin.bookings.index', 'icon' => 'o-calendar', 'label' => 'Booking', 'base' => 'admin.bookings'],
-                    ['route' => 'admin.services.index', 'icon' => 'o-sun', 'label' => 'Servis', 'base' => 'admin.services'],
-                    ['route' => 'admin.work-orders.index', 'icon' => 'o-clipboard-document-list', 'label' => 'Work Order', 'base' => 'admin.work-orders'],
-                    ['route' => 'admin.partners.index', 'icon' => 'o-building-office-2', 'label' => 'Partner', 'base' => 'admin.partners'],
-                    ['route' => 'admin.product-bundles.index', 'icon' => 'o-cube', 'label' => 'Paket Produk', 'base' => 'admin.product-bundles'],
-                    ['route' => 'admin.users.index', 'icon' => 'o-user', 'label' => 'Pengguna', 'base' => 'admin.users'],
-                ],
-                'INVENTORY' => [
-                    ['route' => 'admin.spareparts.index', 'icon' => 'o-wrench', 'label' => 'Sparepart', 'base' => 'admin.spareparts'],
-                    ['route' => 'admin.sparepart-categories.index', 'icon' => 'o-tag', 'label' => 'Kategori Sparepart', 'base' => 'admin.sparepart-categories'],
-                    ['route' => 'admin.stock-movements.index', 'icon' => 'o-arrows-right-left', 'label' => 'Pergerakan Stok', 'base' => 'admin.stock-movements'],
-                ]
-            ] as $group => $items)
+            @php
+                $menuGroups = [
+                    'MENU' => [
+                        ['route' => 'admin.dashboard', 'icon' => 'o-home', 'label' => 'Dashboard', 'base' => 'admin.dashboard'],
+                        ['route' => 'admin.customers.index', 'icon' => 'o-users', 'label' => 'Pelanggan', 'base' => 'admin.customers'],
+                        ['route' => 'admin.vehicles.index', 'icon' => 'o-truck', 'label' => 'Kendaraan', 'base' => 'admin.vehicles'],
+                        ['route' => 'admin.invoices.index', 'icon' => 'o-document-text', 'label' => 'Invoice', 'base' => 'admin.invoices'],
+                        ['route' => 'admin.bookings.index', 'icon' => 'o-calendar', 'label' => 'Booking', 'base' => 'admin.bookings'],
+                        ['route' => 'admin.services.index', 'icon' => 'o-sun', 'label' => 'Servis', 'base' => 'admin.services'],
+                        ['route' => 'admin.work-orders.index', 'icon' => 'o-clipboard-document-list', 'label' => 'Work Order', 'base' => 'admin.work-orders'],
+                        ['route' => 'admin.partners.index', 'icon' => 'o-building-office-2', 'label' => 'Partner', 'base' => 'admin.partners'],
+                        ['route' => 'admin.product-bundles.index', 'icon' => 'o-cube', 'label' => 'Paket Produk', 'base' => 'admin.product-bundles'],
+                        ['route' => 'admin.users.index', 'icon' => 'o-user', 'label' => 'Pengguna', 'base' => 'admin.users'],
+                    ],
+                    'INVENTORY' => [
+                        ['route' => 'admin.spareparts.index', 'icon' => 'o-wrench', 'label' => 'Sparepart', 'base' => 'admin.spareparts'],
+                        ['route' => 'admin.sparepart-categories.index', 'icon' => 'o-tag', 'label' => 'Kategori', 'base' => 'admin.sparepart-categories'],
+                        ['route' => 'admin.stock-movements.index', 'icon' => 'o-arrows-right-left', 'label' => 'Stok', 'base' => 'admin.stock-movements'],
+                    ],
+                ];
+
+                if (auth('admin')->user()?->isSuperAdmin()) {
+                    $menuGroups['ANALITIK'] = [
+                        ['route' => 'admin.orders.index', 'icon' => 'o-shopping-bag', 'label' => 'Orders', 'base' => 'admin.orders'],
+                        ['route' => 'admin.rfm.index', 'icon' => 'o-chart-bar', 'label' => 'RFM', 'base' => 'admin.rfm'],
+                        ['route' => 'admin.reports.index', 'icon' => 'o-banknotes', 'label' => 'Laporan', 'base' => 'admin.reports'],
+                        ['route' => 'admin.settings.index', 'icon' => 'o-cog-6-tooth', 'label' => 'Pengaturan', 'base' => 'admin.settings'],
+                    ];
+                }
+            @endphp
+
+            @foreach($menuGroups as $group => $items)
                 <p x-show="!collapsed" x-cloak
                     class="mb-2 text-[11px] font-bold uppercase tracking-wider text-gray-500 whitespace-nowrap overflow-hidden px-2"
                     :class="{{ $loop->first ? "'mt-0'" : "'mt-8'" }}">
