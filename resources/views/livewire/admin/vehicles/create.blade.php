@@ -22,7 +22,6 @@
         {{-- Pemilik --}}
         <div class="bg-white rounded-xl shadow-sm p-6 space-y-5">
             <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Data Pemilik</h2>
-
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Pemilik / Pelanggan <span class="text-red-600">*</span></label>
                 <select wire:model="customerId"
@@ -43,98 +42,183 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-                {{-- Merk — autocomplete dari DB, boleh ketik baru --}}
-                <div>
+                {{-- MERK — Alpine combobox, pilih dari DB atau ketik baru --}}
+                <div
+                    x-data="{
+                        val: @js($merk),
+                        open: false,
+                        opts: @js($availableMerks),
+                        get hits() {
+                            if (!this.val) return this.opts;
+                            const q = this.val.toLowerCase();
+                            return this.opts.filter(o => o.toLowerCase().includes(q));
+                        },
+                        pick(o) { this.val = o; this.open = false; $wire.set('merk', o); },
+                        onBlur() { setTimeout(() => { this.open = false; $wire.set('merk', this.val); }, 120); }
+                    }"
+                    class="relative"
+                >
                     <label class="block text-sm font-medium text-gray-700 mb-1">
                         Merk <span class="text-red-600">*</span>
                     </label>
-                    <input wire:model.live.debounce.300ms="merk"
-                           list="merk-options"
-                           type="text"
+                    <input type="text"
+                           x-model="val"
+                           @focus="open = hits.length > 0"
+                           @input="open = hits.length > 0"
+                           @blur="onBlur()"
+                           @keydown.escape="open = false"
+                           @keydown.enter.prevent="hits.length && pick(hits[0])"
                            autocomplete="off"
                            placeholder="Honda, Yamaha, Kawasaki..."
-                           class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
-                                  @error('merk') border-red-500 @enderror" />
-                    <datalist id="merk-options">
-                        @foreach($availableMerks as $m)
-                        <option value="{{ $m }}">
-                        @endforeach
-                    </datalist>
+                           class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent @error('merk') border-red-500 @enderror" />
+                    <ul x-show="open && hits.length > 0"
+                        class="absolute z-30 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                        <template x-for="o in hits" :key="o">
+                            <li @mousedown.prevent="pick(o)"
+                                x-text="o"
+                                class="px-3 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-700 cursor-pointer first:rounded-t-lg last:rounded-b-lg"></li>
+                        </template>
+                    </ul>
                     @error('merk') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                 </div>
 
-                {{-- Model — cascade dari merk --}}
-                <div>
+                {{-- MODEL — cascade dari merk --}}
+                <div
+                    x-data="{
+                        val: @js($model),
+                        open: false,
+                        opts: @js($availableModels),
+                        init() {
+                            $wire.$watch('availableModels', v => { this.opts = v ?? []; this.val = ''; });
+                        },
+                        get hits() {
+                            if (!this.val) return this.opts;
+                            const q = this.val.toLowerCase();
+                            return this.opts.filter(o => o.toLowerCase().includes(q));
+                        },
+                        pick(o) { this.val = o; this.open = false; $wire.set('model', o); },
+                        onBlur() { setTimeout(() => { this.open = false; if (this.val !== '') $wire.set('model', this.val); }, 120); }
+                    }"
+                    class="relative"
+                >
                     <label class="block text-sm font-medium text-gray-700 mb-1">
                         Model <span class="text-red-600">*</span>
-                        @if($merk && count($availableModels) > 0)
-                        <span class="text-xs font-normal text-gray-400 ml-1">({{ count($availableModels) }} pilihan)</span>
-                        @endif
+                        <span x-show="opts.length > 0" x-text="'(' + opts.length + ' pilihan)'"
+                              class="text-xs font-normal text-gray-400 ml-1"></span>
                     </label>
-                    <input wire:model.live="model"
-                           list="model-options"
-                           type="text"
+                    <input type="text"
+                           x-model="val"
+                           :readonly="!$wire.merk"
+                           @focus="$wire.merk && (open = hits.length > 0)"
+                           @input="$wire.merk && (open = hits.length > 0)"
+                           @blur="onBlur()"
+                           @keydown.escape="open = false"
+                           @keydown.enter.prevent="hits.length && pick(hits[0])"
                            autocomplete="off"
-                           placeholder="{{ $merk ? 'Pilih atau ketik model...' : 'Isi merk terlebih dahulu' }}"
-                           @if(!$merk) readonly @endif
-                           class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
-                                  {{ !$merk ? 'bg-gray-50 text-gray-400 cursor-not-allowed' : '' }}
-                                  @error('model') border-red-500 @enderror" />
-                    <datalist id="model-options">
-                        @foreach($availableModels as $m)
-                        <option value="{{ $m }}">
-                        @endforeach
-                    </datalist>
+                           :placeholder="$wire.merk ? 'Pilih atau ketik model...' : 'Isi merk terlebih dahulu'"
+                           :class="!$wire.merk ? 'bg-gray-50 text-gray-400 cursor-not-allowed' : ''"
+                           class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent @error('model') border-red-500 @enderror" />
+                    <ul x-show="open && hits.length > 0"
+                        class="absolute z-30 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                        <template x-for="o in hits" :key="o">
+                            <li @mousedown.prevent="pick(o)"
+                                x-text="o"
+                                class="px-3 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-700 cursor-pointer first:rounded-t-lg last:rounded-b-lg"></li>
+                        </template>
+                    </ul>
                     @error('model') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                 </div>
 
-                {{-- Tipe/Varian — cascade dari model --}}
-                <div>
+                {{-- TIPE — cascade dari model --}}
+                <div
+                    x-data="{
+                        val: @js($tipe),
+                        open: false,
+                        opts: @js($availableTipes),
+                        init() {
+                            $wire.$watch('availableTipes', v => { this.opts = v ?? []; this.val = ''; });
+                        },
+                        get hits() {
+                            if (!this.val) return this.opts;
+                            const q = this.val.toLowerCase();
+                            return this.opts.filter(o => o.toLowerCase().includes(q));
+                        },
+                        pick(o) { this.val = o; this.open = false; $wire.set('tipe', o); },
+                        onBlur() { setTimeout(() => { this.open = false; $wire.set('tipe', this.val); }, 120); }
+                    }"
+                    class="relative"
+                >
                     <label class="block text-sm font-medium text-gray-700 mb-1">
                         Tipe / Varian
-                        @if($model && count($availableTipes) > 0)
-                        <span class="text-xs font-normal text-gray-400 ml-1">({{ count($availableTipes) }} pilihan)</span>
-                        @endif
+                        <span x-show="opts.length > 0" x-text="'(' + opts.length + ' pilihan)'"
+                              class="text-xs font-normal text-gray-400 ml-1"></span>
                     </label>
-                    <input wire:model.live="tipe"
-                           list="tipe-options"
-                           type="text"
+                    <input type="text"
+                           x-model="val"
+                           :readonly="!$wire.model"
+                           @focus="$wire.model && (open = hits.length > 0)"
+                           @input="$wire.model && (open = hits.length > 0)"
+                           @blur="onBlur()"
+                           @keydown.escape="open = false"
+                           @keydown.enter.prevent="hits.length && pick(hits[0])"
                            autocomplete="off"
-                           placeholder="{{ $model ? 'Pilih atau ketik varian...' : 'Isi model terlebih dahulu' }}"
-                           @if(!$model) readonly @endif
-                           class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
-                                  {{ !$model ? 'bg-gray-50 text-gray-400 cursor-not-allowed' : '' }}" />
-                    <datalist id="tipe-options">
-                        @foreach($availableTipes as $t)
-                        <option value="{{ $t }}">
-                        @endforeach
-                    </datalist>
+                           :placeholder="$wire.model ? 'Pilih atau ketik varian...' : 'Isi model terlebih dahulu'"
+                           :class="!$wire.model ? 'bg-gray-50 text-gray-400 cursor-not-allowed' : ''"
+                           class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent" />
+                    <ul x-show="open && hits.length > 0"
+                        class="absolute z-30 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                        <template x-for="o in hits" :key="o">
+                            <li @mousedown.prevent="pick(o)"
+                                x-text="o"
+                                class="px-3 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-700 cursor-pointer first:rounded-t-lg last:rounded-b-lg"></li>
+                        </template>
+                    </ul>
                 </div>
 
-                {{-- Tahun — cascade dari model (+tipe jika diisi) --}}
-                <div>
+                {{-- TAHUN — cascade dari model (+tipe jika diisi) --}}
+                <div
+                    x-data="{
+                        val: @js($tahun),
+                        open: false,
+                        opts: @js($availableYears),
+                        init() {
+                            $wire.$watch('availableYears', v => { this.opts = v ?? []; this.val = ''; });
+                        },
+                        get hits() {
+                            if (!this.val) return this.opts;
+                            return this.opts.filter(o => String(o).includes(String(this.val)));
+                        },
+                        pick(o) { this.val = String(o); this.open = false; $wire.set('tahun', String(o)); },
+                        onBlur() { setTimeout(() => { this.open = false; if (this.val) $wire.set('tahun', this.val); }, 120); }
+                    }"
+                    class="relative"
+                >
                     <label class="block text-sm font-medium text-gray-700 mb-1">
                         Tahun <span class="text-red-600">*</span>
-                        @if($model && count($availableYears) > 0)
-                        <span class="text-xs font-normal text-gray-400 ml-1">({{ count($availableYears) }} pilihan)</span>
-                        @endif
+                        <span x-show="opts.length > 0" x-text="'(' + opts.length + ' pilihan)'"
+                              class="text-xs font-normal text-gray-400 ml-1"></span>
                     </label>
-                    <input wire:model="tahun"
-                           list="tahun-options"
-                           type="number"
-                           min="1970"
-                           max="{{ date('Y') + 1 }}"
+                    <input type="number"
+                           x-model="val"
+                           min="1970" max="{{ date('Y') + 1 }}"
+                           :readonly="!$wire.model"
+                           @focus="$wire.model && (open = hits.length > 0)"
+                           @input="$wire.model && (open = hits.length > 0)"
+                           @blur="onBlur()"
+                           @keydown.escape="open = false"
+                           @keydown.enter.prevent="hits.length && pick(hits[0])"
                            autocomplete="off"
-                           placeholder="{{ $model ? date('Y') : 'Isi model terlebih dahulu' }}"
-                           @if(!$model) readonly @endif
-                           class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent
-                                  {{ !$model ? 'bg-gray-50 text-gray-400 cursor-not-allowed' : '' }}
-                                  @error('tahun') border-red-500 @enderror" />
-                    <datalist id="tahun-options">
-                        @foreach($availableYears as $y)
-                        <option value="{{ $y }}">
-                        @endforeach
-                    </datalist>
+                           :placeholder="$wire.model ? '{{ date('Y') }}' : 'Isi model terlebih dahulu'"
+                           :class="!$wire.model ? 'bg-gray-50 text-gray-400 cursor-not-allowed' : ''"
+                           class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent @error('tahun') border-red-500 @enderror" />
+                    <ul x-show="open && hits.length > 0"
+                        class="absolute z-30 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                        <template x-for="o in hits" :key="o">
+                            <li @mousedown.prevent="pick(o)"
+                                x-text="o"
+                                class="px-3 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-red-700 cursor-pointer first:rounded-t-lg last:rounded-b-lg"></li>
+                        </template>
+                    </ul>
                     @error('tahun') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                 </div>
 
@@ -160,14 +244,12 @@
         {{-- Nomor Seri --}}
         <div class="bg-white rounded-xl shadow-sm p-6 space-y-4">
             <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Nomor Seri (Opsional)</h2>
-
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">No. Rangka</label>
                     <input wire:model="noRangka" type="text" placeholder="MH1..."
                            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent font-mono" />
                 </div>
-
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">No. Mesin</label>
                     <input wire:model="noMesin" type="text" placeholder="K15E..."
