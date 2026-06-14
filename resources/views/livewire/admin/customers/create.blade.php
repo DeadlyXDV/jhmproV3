@@ -2,7 +2,7 @@
     {{-- Page header --}}
     <div class="mb-6">
         <div class="flex items-center gap-2 text-sm text-gray-500 mb-1">
-            <a href="{{ route('admin.customers.index') }}" class="hover:text-gray-700">Pelanggan</a>
+            <a wire:navigate href="{{ route('admin.customers.index') }}" class="hover:text-gray-700">Pelanggan</a>
             <span>/</span>
             <span>{{ $isEdit ? 'Edit' : 'Tambah Baru' }}</span>
         </div>
@@ -61,7 +61,7 @@
                     class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-5 py-2.5 rounded-lg transition">
                 {{ $isEdit ? 'Simpan Perubahan' : 'Tambah Pelanggan' }}
             </button>
-            <a href="{{ route('admin.customers.index') }}"
+            <a wire:navigate href="{{ route('admin.customers.index') }}"
                class="text-sm text-gray-600 hover:text-gray-800 px-4 py-2.5">Batal</a>
         </div>
     </form>

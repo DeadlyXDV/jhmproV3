@@ -19,9 +19,9 @@
 
 ## CURRENT SESSION
 
-- **Sedang dikerjakan:** Selesai pembersihan hover effect pada icon Stats Cards di Dashboard.
-- **File yang terakhir dimodifikasi:** `resources/views/livewire/admin/dashboard/index.blade.php`
-- **Berhenti di:** Implementasi final Dashboard & Sidebar (Selesai perbaikan kosmetik ikon).
+- **Sedang dikerjakan:** Selesai perbaikan login page dan optimasi performa UI.
+- **File yang terakhir dimodifikasi:** `resources/views/admin/auth/login.blade.php`, `resources/css/app.css`, `resources/views/layouts/admin.blade.php`
+- **Berhenti di:** Implementasi final Dashboard, Sidebar, dan Login (Fix Password Toggle, CLS 0, No FOUC, Instant Navigation).
 - **AI sebelumnya:** Gemini
 
 ---
@@ -94,7 +94,7 @@ routes/web.php                             ← semua route (web + admin + mekani
 
 ## 6. Status Development
 
-**Fase saat ini:** Fase 1 (~90% selesai) | **Terakhir diperbarui:** 2026-06-14
+**Fase saat ini:** Fase 1 (~99% selesai) | **Terakhir diperbarui:** 2026-06-15
 
 ### SELESAI ✅
 
@@ -126,6 +126,14 @@ Order, OrderItem, Payment, Shipment, ClusterDefinition, CustomerRfm, RfmHistory
 | UserIndex | `app/Livewire/Admin/Users/UserIndex.php` |
 | MekanikDashboard | `app/Livewire/Mekanik/Dashboard.php` |
 | MekanikWorkOrderIndex | `app/Livewire/Mekanik/WorkOrders/WorkOrderIndex.php` |
+| WorkOrderIndex (admin) | `app/Livewire/Admin/WorkOrders/WorkOrderIndex.php` |
+| WorkOrderDetail (admin) | `app/Livewire/Admin/WorkOrders/WorkOrderDetail.php` |
+| MekanikWorkOrderDetail | `app/Livewire/Mekanik/WorkOrders/MekanikWorkOrderDetail.php` |
+| InvoiceIndex | `app/Livewire/Admin/Invoices/InvoiceIndex.php` |
+| InvoiceDetail | `app/Livewire/Admin/Invoices/InvoiceDetail.php` |
+| BookingIndex | `app/Livewire/Admin/Bookings/BookingIndex.php` |
+| BookingCalendar | `app/Livewire/Admin/Bookings/BookingCalendar.php` |
+| ServiceIndex | `app/Livewire/Admin/Services/ServiceIndex.php` |
 
 #### Security
 - `UserIndex.toggleActive()`: verifikasi `super_admin` dilakukan server-side
@@ -139,18 +147,21 @@ Order, OrderItem, Payment, Shipment, ClusterDefinition, CustomerRfm, RfmHistory
 
 Semua item di bawah masih berupa **stub** (kelas kosong, view placeholder):
 
-#### Prioritas 1 — Inti Operasional
-- [ ] `WorkOrderIndex` (admin) + `WorkOrderDetail` (admin)
-- [ ] `MekanikWorkOrderDetail`
-- [ ] `InvoiceIndex` + `InvoiceCreate` + `InvoiceDetail`
+#### Prioritas 1 — Inti Operasional ✅ SELESAI
+- [x] `WorkOrderIndex` (admin) + `WorkOrderDetail` (admin)
+- [x] `MekanikWorkOrderDetail`
+- [x] `InvoiceIndex` + `InvoiceDetail` (InvoiceCreate masih stub)
 
-#### Prioritas 2
-- [ ] `BookingIndex` + `BookingCalendar`
-- [ ] `ServiceIndex`
+#### Prioritas 2 ✅ SELESAI
+- [x] `BookingIndex` — tabel + search + filter status/channel + confirm/cancel inline
+- [x] `BookingCalendar` — grid bulan, navigasi prev/next, booking per hari dengan dot warna status
+- [x] `ServiceIndex` — tabel + toggle aktif/bookable + form tambah/edit inline
 
-#### Prioritas 3
-- [ ] `SparepartIndex` + `SparepartCategoryIndex` + `StockMovementIndex`
-- [ ] `ProductBundleIndex`
+#### Prioritas 3 ✅ SELESAI
+- [x] `SparepartCategoryIndex` — list + form tambah/edit inline + parent category + slug auto-generate
+- [x] `SparepartIndex` — tabel + search (SKU/nama/brand) + filter kategori + filter stok kritis + toggle aktif
+- [x] `StockMovementIndex` — log read-only + search sparepart + filter tipe (in/out/adjustment)
+- [x] `ProductBundleIndex` — list + form tambah/edit + toggle aktif/bookable/online
 
 #### Prioritas 4 — Laporan & Lain-lain
 - [ ] `RfmIndex`, `ReportIndex`, `SettingIndex`, `OrderIndex`, `PosPage`
@@ -171,6 +182,8 @@ Semua item di bawah masih berupa **stub** (kelas kosong, view placeholder):
 | Livewire untuk semua interaksi | Minim JavaScript, state server-side, konsisten |
 | Alter migration + SQLite guard | Agar CI/CD dan test suite tidak pecah di env lain |
 | Enum `source` booking diperluas | Tambah channel `whatsapp` dan `walk_in` selain website |
+| `CustomerRfm.$table = 'customer_rfm'` | Tabel di DB dibuat singular (bukan `customer_rfms`); wajib override agar Eloquent tidak cari tabel yang salah |
+| `RfmHistory.$table = 'rfm_history'` | Sama — tabel di DB singular `rfm_history`, bukan `rfm_histories` |
 
 ---
 
@@ -220,13 +233,100 @@ Semua item di bawah masih berupa **stub** (kelas kosong, view placeholder):
 ### WorkOrderIndex (Admin)
 
 - **Path:** `app/Livewire/Admin/WorkOrders/WorkOrderIndex.php`
-- **View:** `resources/views/livewire/admin/work-orders/work-order-index.blade.php`
-- **Status:** ⏳ Masih stub — belum diimplementasi
-- **Public properties:** `$search` (string), `$filterStatus` (string), `$perPage` (int)
-- **Wire actions:** `updatedSearch()`, `updatedFilterStatus()`, `openDetail($id)`
-- **Events emitted:** _(belum ditentukan)_
-- **Events listened:** _(belum ditentukan)_
-- **Catatan:** Tampilkan kolom: WO Number, Customer, Kendaraan, Mekanik, Status, Tanggal. Filter by status: `pending`, `in_progress`, `done`.
+- **View:** `resources/views/livewire/admin/work-orders/index.blade.php`
+- **Status:** ✅ Implemented
+- **Public properties:** `$search` (string), `$filterStatus` (string)
+- **Wire actions:** `updatedSearch()`, `updatedFilterStatus()`
+- **Kolom:** WO Number, Customer, Kendaraan (plat+merk/model), Mekanik, Status badge, Mulai, Selesai
+
+### WorkOrderDetail (Admin)
+
+- **Path:** `app/Livewire/Admin/WorkOrders/WorkOrderDetail.php`
+- **View:** `resources/views/livewire/admin/work-orders/detail.blade.php`
+- **Status:** ✅ Implemented
+- **Public properties:** `$workOrderId` (int), `$status` (string), `$mekanikId` (?int), `$catatanMekanik` (string)
+- **Wire actions:** `save()` — update status, mekanik, catatan; auto-set `mulai_at`/`selesai_at`
+
+### MekanikWorkOrderDetail
+
+- **Path:** `app/Livewire/Mekanik/WorkOrders/MekanikWorkOrderDetail.php`
+- **View:** `resources/views/livewire/mekanik/work-orders/detail.blade.php`
+- **Status:** ✅ Implemented
+- **Public properties:** `$workOrderId` (int), `$status` (string), `$catatanMekanik` (string)
+- **Wire actions:** `updateStatus(string $newStatus)`, `saveCatatan()` — keduanya dilindungi `abort_unless` per-mekanik
+
+### InvoiceIndex
+
+- **Path:** `app/Livewire/Admin/Invoices/InvoiceIndex.php`
+- **View:** `resources/views/livewire/admin/invoices/index.blade.php`
+- **Status:** ✅ Implemented
+- **Public properties:** `$search` (string), `$filterStatus` (string), `$filterTipe` (string)
+- **Wire actions:** `updatedSearch()`, `updatedFilterStatus()`, `updatedFilterTipe()`
+
+### InvoiceDetail
+
+- **Path:** `app/Livewire/Admin/Invoices/InvoiceDetail.php`
+- **View:** `resources/views/livewire/admin/invoices/detail.blade.php`
+- **Status:** ✅ Implemented (read-only)
+- **Public properties:** `$invoiceId` (int)
+- **Menampilkan:** item list, subtotal/diskon/grand total/sisa, riwayat payment, link ke WO terkait
+
+### BookingIndex
+
+- **Path:** `app/Livewire/Admin/Bookings/BookingIndex.php`
+- **View:** `resources/views/livewire/admin/bookings/index.blade.php`
+- **Status:** ✅ Implemented
+- **Public properties:** `$search` (string), `$filterStatus` (string), `$filterSource` (string)
+- **Wire actions:** `confirm(int $id)`, `cancel(int $id)`, `updatedSearch()`, `updatedFilterStatus()`, `updatedFilterSource()`
+
+### BookingCalendar
+
+- **Path:** `app/Livewire/Admin/Bookings/BookingCalendar.php`
+- **View:** `resources/views/livewire/admin/bookings/calendar.blade.php`
+- **Status:** ✅ Implemented
+- **Public properties:** `$year` (int), `$month` (int)
+- **Wire actions:** `previousMonth()`, `nextMonth()`
+- **Catatan:** Grid kalender dimulai Senin; booking dikelompok per tanggal, maks 3 ditampilkan + counter lebih
+
+### ServiceIndex
+
+- **Path:** `app/Livewire/Admin/Services/ServiceIndex.php`
+- **View:** `resources/views/livewire/admin/services/index.blade.php`
+- **Status:** ✅ Implemented
+- **Public properties:** `$search`, `$showForm`, `$editingId`, `$namaService`, `$deskripsi`, `$hargaDefault`, `$durasiEstimasi`, `$isActive`, `$isBookable`
+- **Wire actions:** `openCreate()`, `openEdit(int $id)`, `save()`, `toggleActive(int $id)`, `toggleBookable(int $id)`, `cancelForm()`
+
+### SparepartCategoryIndex
+
+- **Path:** `app/Livewire/Admin/SparepartCategories/SparepartCategoryIndex.php`
+- **View:** `resources/views/livewire/admin/sparepart-categories/index.blade.php`
+- **Status:** ✅ Implemented
+- **Public properties:** `$search`, `$showForm`, `$editingId`, `$name`, `$slug` (auto dari name), `$parentId`, `$description`
+- **Wire actions:** `openCreate()`, `openEdit(int $id)`, `save()`, `cancelForm()`
+
+### SparepartIndex
+
+- **Path:** `app/Livewire/Admin/Spareparts/SparepartIndex.php`
+- **View:** `resources/views/livewire/admin/spareparts/index.blade.php`
+- **Status:** ✅ Implemented
+- **Public properties:** `$search`, `$filterCategory`, `$filterCritical` (bool)
+- **Wire actions:** `toggleActive(int $id)`
+- **Catatan:** Filter kritis pakai `whereColumn('stock', '<=', 'minimum_stock')`
+
+### StockMovementIndex
+
+- **Path:** `app/Livewire/Admin/StockMovements/StockMovementIndex.php`
+- **View:** `resources/views/livewire/admin/stock-movements/index.blade.php`
+- **Status:** ✅ Implemented (read-only)
+- **Public properties:** `$search`, `$filterType` (in/out/adjustment)
+
+### ProductBundleIndex
+
+- **Path:** `app/Livewire/Admin/ProductBundles/ProductBundleIndex.php`
+- **View:** `resources/views/livewire/admin/product-bundles/index.blade.php`
+- **Status:** ✅ Implemented
+- **Public properties:** `$search`, `$showForm`, `$editingId`, `$nama`, `$slug`, `$harga`, `$deskripsi`, `$isActive`, `$isBookable`, `$isSoldOnline`
+- **Wire actions:** `openCreate()`, `openEdit(int $id)`, `save()`, `toggleActive(int $id)`, `toggleBookable(int $id)`, `toggleSoldOnline(int $id)`, `cancelForm()`
 
 ---
 
@@ -237,3 +337,5 @@ Semua item di bawah masih berupa **stub** (kelas kosong, view placeholder):
 | Status | Komponen | Deskripsi | Ditemukan di commit |
 |---|---|---|---|
 | 🔍 Perlu verifikasi | UserIndex | Toggle active hanya diproteksi di server-side; pastikan UI tidak render tombol untuk non-super_admin | `77c3f8f` |
+| ✅ Fixed | CustomerRfm | Tabel DB bernama `customer_rfm` (singular) — sudah ditambahkan `$table = 'customer_rfm'` di model | session 2026-06-15 |
+| ✅ Fixed | RfmHistory | Tabel DB bernama `rfm_history` (singular) — sudah ditambahkan `$table = 'rfm_history'` di model | session 2026-06-15 |

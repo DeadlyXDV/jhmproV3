@@ -26,7 +26,7 @@
 
     {{-- Breadcrumb --}}
     <div class="flex items-center gap-2 text-sm text-gray-500 mb-4">
-        <a href="{{ route('admin.vehicles.index') }}" class="hover:text-gray-700">Kendaraan</a>
+        <a wire:navigate href="{{ route('admin.vehicles.index') }}" class="hover:text-gray-700">Kendaraan</a>
         <span>/</span>
         <span class="text-gray-900 font-medium">{{ $vehicle->merk }} {{ $vehicle->model }}</span>
     </div>
@@ -50,7 +50,7 @@
                 @if($vehicle->customer)
                 <p class="text-sm text-gray-500 mt-1">
                     Pemilik:
-                    <a href="{{ route('admin.customers.show', $vehicle->customer) }}"
+                    <a wire:navigate href="{{ route('admin.customers.show', $vehicle->customer) }}"
                        class="text-red-600 hover:underline">{{ $vehicle->customer->nama }}</a>
                 </p>
                 @endif

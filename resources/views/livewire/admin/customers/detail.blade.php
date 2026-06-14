@@ -15,7 +15,7 @@
 
     {{-- Breadcrumb --}}
     <div class="flex items-center gap-2 text-sm text-gray-500 mb-4">
-        <a href="{{ route('admin.customers.index') }}" class="hover:text-gray-700">Pelanggan</a>
+        <a wire:navigate href="{{ route('admin.customers.index') }}" class="hover:text-gray-700">Pelanggan</a>
         <span>/</span>
         <span class="text-gray-900 font-medium">{{ $customer->nama }}</span>
     </div>
@@ -50,7 +50,7 @@
                     </div>
                 </div>
             </div>
-            <a href="{{ route('admin.customers.edit', $customer) }}"
+            <a wire:navigate href="{{ route('admin.customers.edit', $customer) }}"
                class="flex items-center gap-1.5 border border-gray-300 text-gray-700 text-sm px-4 py-2 rounded-lg hover:bg-gray-50 transition">
                 <x-heroicon-o-pencil class="w-4 h-4" />
                 Edit
@@ -106,7 +106,7 @@
                             @if($vehicle->warna) · {{ $vehicle->warna }} @endif
                         </p>
                     </div>
-                    <a href="{{ route('admin.vehicles.show', $vehicle) }}"
+                    <a wire:navigate href="{{ route('admin.vehicles.show', $vehicle) }}"
                        class="text-gray-400 hover:text-gray-700 transition">
                         <x-heroicon-o-arrow-right class="w-4 h-4" />
                     </a>

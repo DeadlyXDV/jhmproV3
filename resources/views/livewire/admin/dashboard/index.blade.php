@@ -2,7 +2,7 @@
 
 <x-slot name="breadcrumbs">
     <nav class="flex items-center gap-2 text-[13px] text-gray-400 mb-0.5">
-        <a href="{{ route('admin.dashboard') }}" wire:navigate class="hover:text-gray-600 transition-colors">Beranda</a>
+        <a wire:navigate href="{{ route('admin.dashboard') }}" wire:navigate class="hover:text-gray-600 transition-colors">Beranda</a>
         <x-heroicon-m-chevron-right class="w-3 h-3" />
         <span class="text-gray-500">Dashboard</span>
     </nav>

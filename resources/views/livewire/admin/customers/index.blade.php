@@ -5,7 +5,7 @@
             <h1 class="text-xl font-bold text-gray-900">Pelanggan</h1>
             <p class="text-sm text-gray-500 mt-0.5">Daftar semua pelanggan bengkel</p>
         </div>
-        <a href="{{ route('admin.customers.create') }}"
+        <a wire:navigate href="{{ route('admin.customers.create') }}"
            class="flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
             <x-heroicon-o-plus class="w-4 h-4" />
             Tambah Pelanggan
@@ -93,11 +93,11 @@
                     </td>
                     <td class="px-5 py-4">
                         <div class="flex items-center gap-2 justify-end">
-                            <a href="{{ route('admin.customers.show', $customer) }}"
+                            <a wire:navigate href="{{ route('admin.customers.show', $customer) }}"
                                class="text-gray-400 hover:text-gray-700 transition">
                                 <x-heroicon-o-eye class="w-4 h-4" />
                             </a>
-                            <a href="{{ route('admin.customers.edit', $customer) }}"
+                            <a wire:navigate href="{{ route('admin.customers.edit', $customer) }}"
                                class="text-gray-400 hover:text-blue-600 transition">
                                 <x-heroicon-o-pencil class="w-4 h-4" />
                             </a>

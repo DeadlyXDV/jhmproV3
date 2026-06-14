@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -18,12 +19,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property float $rfm_score
  * @property int $cluster_id
  * @property string $cluster_label
- * @property \Illuminate\Support\Carbon $period_start
- * @property \Illuminate\Support\Carbon $period_end
- * @property \Illuminate\Support\Carbon $calculated_at
+ * @property Carbon $period_start
+ * @property Carbon $period_end
+ * @property Carbon $calculated_at
  */
 class CustomerRfm extends Model
 {
+    protected $table = 'customer_rfm';
+
     public $timestamps = false;
 
     protected $fillable = [

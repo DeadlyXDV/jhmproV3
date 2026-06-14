@@ -1,3 +1,17 @@
+## Shared Memory — MEMORY.md
+
+Di project ini terdapat file `MEMORY.md` di root direktori. File ini berfungsi sebagai **shared memory lintas AI provider** (Claude, Codex, Gemini, dll).
+
+Anda WAJIB memperbarui `MEMORY.md` sebelum mengakhiri chat atau menyatakan task selesai, setiap kali:
+
+1. Menyelesaikan task baru — update status di section 6 (centang `[ ]` jadi `[x]` atau tambah item ke SELESAI)
+2. Mengubah keputusan arsitektur — tambahkan ke section 7
+3. Menemukan bug krusial yang perlu diperbaiki nanti — tambahkan ke section 6 sebagai item baru
+
+Jangan ubah bagian yang tidak terkait. Cukup perbarui statusnya saja.
+
+---
+
 <laravel-boost-guidelines>
 === foundation rules ===
 

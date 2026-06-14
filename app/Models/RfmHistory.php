@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class RfmHistory extends Model
 {
+    protected $table = 'rfm_history';
+
     public $timestamps = false;
 
     protected $fillable = [

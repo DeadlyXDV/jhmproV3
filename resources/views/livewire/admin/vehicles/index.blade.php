@@ -44,7 +44,7 @@
                     </td>
                     <td class="px-5 py-4">
                         @if($vehicle->customer)
-                        <a href="{{ route('admin.customers.show', $vehicle->customer) }}"
+                        <a wire:navigate href="{{ route('admin.customers.show', $vehicle->customer) }}"
                            class="text-red-600 hover:underline">{{ $vehicle->customer->nama }}</a>
                         @else
                         <span class="text-gray-400">-</span>
@@ -54,7 +54,7 @@
                     <td class="px-5 py-4 text-gray-600">{{ $vehicle->warna ?: '-' }}</td>
                     <td class="px-5 py-4 text-gray-700">{{ $vehicle->total_servis }}</td>
                     <td class="px-5 py-4">
-                        <a href="{{ route('admin.vehicles.show', $vehicle) }}"
+                        <a wire:navigate href="{{ route('admin.vehicles.show', $vehicle) }}"
                            class="text-gray-400 hover:text-gray-700 transition">
                             <x-heroicon-o-eye class="w-4 h-4" />
                         </a>
