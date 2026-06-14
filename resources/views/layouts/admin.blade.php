@@ -8,14 +8,20 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
-<body class="h-full bg-[#F3F4F6] font-[Inter,ui-sans-serif,system-ui]">
+<body class="h-full bg-[#F3F4F6] font-[Inter,ui-sans-serif,system-ui]"
+    x-data="{ 
+        collapsed: localStorage.getItem('sidebar-collapsed') === 'true',
+        toggle() {
+            this.collapsed = !this.collapsed;
+            localStorage.setItem('sidebar-collapsed', this.collapsed);
+        }
+    }"
+    @toggle-sidebar.window="toggle()">
 
     {{-- Sidebar --}}
     <aside id="sidebar"
-        class="fixed inset-y-0 left-0 z-40 bg-[#14161b] flex flex-col w-64"
-        :class="collapsed ? 'w-20' : 'w-64'"
-        x-data="{ collapsed: false }"
-        @toggle-sidebar.window="collapsed = !collapsed">
+        class="fixed inset-y-0 left-0 z-40 bg-[#14161b] flex flex-col overflow-hidden transition-all duration-300"
+        :class="collapsed ? 'w-20' : 'w-64'">
 
         {{-- Logo --}}
         <div class="flex items-center gap-3 h-16 flex-shrink-0"
@@ -23,8 +29,7 @@
             <div class="w-10 h-10 bg-[#E11D22] rounded-[12px] flex items-center justify-center shadow-lg shadow-red-600/20 flex-none">
                 <svg viewBox="0 0 40 42" class="w-6 h-6 text-white"><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M17.2 5.633 8.6.855 0 5.633v26.51l16.2 9 16.2-9v-8.442l7.6-4.223V9.856l-8.6-4.777-8.6 4.777V18.3l-5.6 3.111V5.633ZM38 18.301l-5.6 3.11v-6.157l5.6-3.11V18.3Zm-1.06-7.856-5.54 3.078-5.54-3.079 5.54-3.078 5.54 3.079ZM24.8 18.3v-6.157l5.6 3.111v6.158L24.8 18.3Zm-1 1.732 5.54 3.078-13.14 7.302-5.54-3.078 13.14-7.3v-.002Zm-16.2 7.89 7.6 4.222V38.3L2 30.966V7.92l5.6 3.111v16.892ZM8.6 9.3 3.06 6.222 8.6 3.143l5.54 3.08L8.6 9.3Zm21.8 15.51-13.2 7.334V38.3l13.2-7.334v-6.156ZM9.6 11.034l5.6-3.11v14.6l-5.6 3.11v-14.6Z" /></svg>
             </div>
-            <span class="text-white font-bold text-[20px] tracking-tight whitespace-nowrap overflow-hidden"
-                :class="collapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'">
+            <span x-show="!collapsed" x-cloak class="text-white font-bold text-[20px] tracking-tight whitespace-nowrap overflow-hidden">
                 JHM<span class="text-[#E11D22]">Pro</span>
             </span>
         </div>
@@ -52,8 +57,9 @@
                     ['route' => 'admin.stock-movements.index', 'icon' => 'o-arrows-right-left', 'label' => 'Pergerakan Stok'],
                 ]
             ] as $group => $items)
-                <p class="mb-2 text-[11px] font-bold uppercase tracking-wider text-gray-500 whitespace-nowrap overflow-hidden"
-                    :class="collapsed ? 'h-0 opacity-0 mt-0' : 'px-2 h-auto opacity-100 {{ $loop->first ? 'mt-0' : 'mt-8' }}'">
+                <p x-show="!collapsed" x-cloak
+                    class="mb-2 text-[11px] font-bold uppercase tracking-wider text-gray-500 whitespace-nowrap overflow-hidden px-2"
+                    :class="{{ $loop->first ? "'mt-0'" : "'mt-8'" }}">
                     {{ $group }}
                 </p>
 
@@ -62,7 +68,6 @@
                         href="{{ route($item['route']) }}"
                         icon="{{ $item['icon'] }}"
                         :active="request()->routeIs($item['route'] . '*')"
-                        ::collapsed="collapsed"
                     >
                         {{ $item['label'] }}
                     </x-admin.nav-item>
@@ -74,15 +79,13 @@
 
     {{-- Main area --}}
     <div class="flex flex-col min-h-screen"
-        :class="collapsed ? 'ml-20' : 'ml-64'"
-        x-data="{ collapsed: false }"
-        @toggle-sidebar.window="collapsed = !collapsed">
+        :class="collapsed ? 'ml-20' : 'ml-64'">
 
         {{-- Topbar --}}
         <header class="fixed top-0 right-0 z-30 h-20 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center px-8 gap-6"
             :class="collapsed ? 'left-20' : 'left-64'">
             {{-- Menu Toggle --}}
-            <button @click="$dispatch('toggle-sidebar')" class="p-2.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-xl">
+            <button @click="$dispatch('toggle-sidebar')" class="p-2.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-xl cursor-pointer">
                 <x-heroicon-o-bars-3-bottom-left class="w-6 h-6" :class="collapsed ? 'rotate-180' : ''" />
             </button>
 
@@ -175,5 +178,3 @@
     @livewireScripts
 </body>
 </html>
-
->
