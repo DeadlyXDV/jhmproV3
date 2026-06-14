@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login Admin — JHMPro</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @livewireStyles
 </head>
 <body class="h-full font-[Inter,ui-sans-serif,system-ui]">
 
@@ -102,6 +103,6 @@
     </div>
 </div>
 
-@vite(['resources/js/app.js'])
+@livewireScripts
 </body>
 </html>
