@@ -12,7 +12,7 @@
 
     {{-- Sidebar --}}
     <aside id="sidebar"
-        class="fixed inset-y-0 left-0 z-40 bg-[#14161b] flex flex-col"
+        class="fixed inset-y-0 left-0 z-40 bg-[#14161b] flex flex-col w-64"
         :class="collapsed ? 'w-20' : 'w-64'"
         x-data="{ collapsed: false }"
         @toggle-sidebar.window="collapsed = !collapsed">
@@ -139,7 +139,7 @@
                         class="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50">
 
                         @if(auth('admin')->user()?->isAdmin())
-                        <a href="{{ route('admin.pos') }}"
+                        <a href="{{ route('admin.pos') }}" wire:navigate
                             class="flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-white bg-red-600 mx-2 mb-2 rounded-xl shadow-lg shadow-red-600/20 hover:bg-red-700 transition-colors">
                             <x-heroicon-o-calculator class="w-5 h-5" />
                             Buka Kasir POS
@@ -147,7 +147,7 @@
                         <div class="border-t border-gray-100 my-2"></div>
                         @endif
 
-                        <a href="{{ route('admin.settings.index') }}"
+                        <a href="{{ route('admin.settings.index') }}" wire:navigate
                             class="flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                             <x-heroicon-o-cog-6-tooth class="w-5 h-5 text-gray-400" />
                             Pengaturan Profil
@@ -175,3 +175,5 @@
     @livewireScripts
 </body>
 </html>
+
+>
