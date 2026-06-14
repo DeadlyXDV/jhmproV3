@@ -10,6 +10,41 @@ Anda WAJIB memperbarui `MEMORY.md` sebelum mengakhiri chat atau menyatakan task 
 
 Jangan ubah bagian yang tidak terkait. Cukup perbarui statusnya saja.
 
+- **Update section CURRENT SESSION di MEMORY.md** setelah setiap task selesai.
+- **Isi:** sedang dikerjakan, file yang dimodifikasi, berhenti di, AI sebelumnya: Gemini.
+- Jika menemukan bug di luar scope frontend, catat di section `Known Issues` `MEMORY.md` — **jangan fix sendiri**.
+
+---
+
+## Git Commit — Wajib Setelah Setiap Perubahan
+
+Setiap kali Anda menyelesaikan satu task atau satu kelompok perubahan yang kohesif, Anda **WAJIB** membuat git commit sebelum mengakhiri respons. Tidak ada pengecualian.
+
+**Urutan wajib:**
+1. Jalankan `vendor/bin/pint --dirty --format agent` (jika ada file PHP yang dimodifikasi)
+2. Jalankan `php artisan test --compact` (pastikan tests pass)
+3. Perbarui `MEMORY.md`
+4. Buat git commit dengan pesan yang deskriptif
+
+**Format pesan commit:**
+```
+<type>(<scope>): <deskripsi singkat dalam bahasa Indonesia atau Inggris>
+```
+Type: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`
+Scope: nama fitur/komponen, contoh: `vehicles`, `spareparts`, `auth`
+
+**Contoh:**
+```
+feat(vehicles): tambah CRUD kendaraan — VehicleCreate + routes create/edit
+feat(inventory): implementasi SparepartIndex, CategoryIndex, StockMovementIndex, ProductBundleIndex
+fix(models): override $table untuk CustomerRfm dan RfmHistory
+```
+
+**DILARANG:**
+- Menambahkan `Co-authored-by: Claude` atau sejenisnya
+- Skip commit karena perubahan "kecil" — semua perubahan harus di-commit
+- Commit file `.env` atau credentials
+
 ---
 
 <laravel-boost-guidelines>

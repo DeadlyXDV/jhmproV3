@@ -123,6 +123,7 @@ Order, OrderItem, Payment, Shipment, ClusterDefinition, CustomerRfm, RfmHistory
 | PartnerIndex | `app/Livewire/Admin/Partners/PartnerIndex.php` |
 | VehicleIndex | `app/Livewire/Admin/Vehicles/VehicleIndex.php` |
 | VehicleDetail | `app/Livewire/Admin/Vehicles/VehicleDetail.php` |
+| VehicleCreate | `app/Livewire/Admin/Vehicles/VehicleCreate.php` |
 | UserIndex | `app/Livewire/Admin/Users/UserIndex.php` |
 | MekanikDashboard | `app/Livewire/Mekanik/Dashboard.php` |
 | MekanikWorkOrderIndex | `app/Livewire/Mekanik/WorkOrders/WorkOrderIndex.php` |
