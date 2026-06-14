@@ -40,21 +40,21 @@
 
             @foreach([
                 'MENU' => [
-                    ['route' => 'admin.dashboard', 'icon' => 'o-home', 'label' => 'Dashboard'],
-                    ['route' => 'admin.customers.index', 'icon' => 'o-users', 'label' => 'Pelanggan'],
-                    ['route' => 'admin.vehicles.index', 'icon' => 'o-truck', 'label' => 'Kendaraan'],
-                    ['route' => 'admin.invoices.index', 'icon' => 'o-document-text', 'label' => 'Invoice'],
-                    ['route' => 'admin.bookings.index', 'icon' => 'o-calendar', 'label' => 'Booking'],
-                    ['route' => 'admin.services.index', 'icon' => 'o-sun', 'label' => 'Servis'],
-                    ['route' => 'admin.work-orders.index', 'icon' => 'o-clipboard-document-list', 'label' => 'Work Order'],
-                    ['route' => 'admin.partners.index', 'icon' => 'o-building-office-2', 'label' => 'Partner'],
-                    ['route' => 'admin.product-bundles.index', 'icon' => 'o-cube', 'label' => 'Paket Produk'],
-                    ['route' => 'admin.users.index', 'icon' => 'o-user', 'label' => 'Pengguna'],
+                    ['route' => 'admin.dashboard', 'icon' => 'o-home', 'label' => 'Dashboard', 'base' => 'admin.dashboard'],
+                    ['route' => 'admin.customers.index', 'icon' => 'o-users', 'label' => 'Pelanggan', 'base' => 'admin.customers'],
+                    ['route' => 'admin.vehicles.index', 'icon' => 'o-truck', 'label' => 'Kendaraan', 'base' => 'admin.vehicles'],
+                    ['route' => 'admin.invoices.index', 'icon' => 'o-document-text', 'label' => 'Invoice', 'base' => 'admin.invoices'],
+                    ['route' => 'admin.bookings.index', 'icon' => 'o-calendar', 'label' => 'Booking', 'base' => 'admin.bookings'],
+                    ['route' => 'admin.services.index', 'icon' => 'o-sun', 'label' => 'Servis', 'base' => 'admin.services'],
+                    ['route' => 'admin.work-orders.index', 'icon' => 'o-clipboard-document-list', 'label' => 'Work Order', 'base' => 'admin.work-orders'],
+                    ['route' => 'admin.partners.index', 'icon' => 'o-building-office-2', 'label' => 'Partner', 'base' => 'admin.partners'],
+                    ['route' => 'admin.product-bundles.index', 'icon' => 'o-cube', 'label' => 'Paket Produk', 'base' => 'admin.product-bundles'],
+                    ['route' => 'admin.users.index', 'icon' => 'o-user', 'label' => 'Pengguna', 'base' => 'admin.users'],
                 ],
                 'INVENTORY' => [
-                    ['route' => 'admin.spareparts.index', 'icon' => 'o-wrench', 'label' => 'Sparepart'],
-                    ['route' => 'admin.sparepart-categories.index', 'icon' => 'o-tag', 'label' => 'Kategori Sparepart'],
-                    ['route' => 'admin.stock-movements.index', 'icon' => 'o-arrows-right-left', 'label' => 'Pergerakan Stok'],
+                    ['route' => 'admin.spareparts.index', 'icon' => 'o-wrench', 'label' => 'Sparepart', 'base' => 'admin.spareparts'],
+                    ['route' => 'admin.sparepart-categories.index', 'icon' => 'o-tag', 'label' => 'Kategori Sparepart', 'base' => 'admin.sparepart-categories'],
+                    ['route' => 'admin.stock-movements.index', 'icon' => 'o-arrows-right-left', 'label' => 'Pergerakan Stok', 'base' => 'admin.stock-movements'],
                 ]
             ] as $group => $items)
                 <p x-show="!collapsed" x-cloak
@@ -67,7 +67,7 @@
                     <x-admin.nav-item
                         href="{{ route($item['route']) }}"
                         icon="{{ $item['icon'] }}"
-                        :active="request()->routeIs($item['route'] . '*')"
+                        :active="request()->routeIs($item['base'] . '*')"
                     >
                         {{ $item['label'] }}
                     </x-admin.nav-item>
