@@ -1,3 +1,13 @@
+<x-slot name="title">Dashboard</x-slot>
+
+<x-slot name="breadcrumbs">
+    <nav class="flex items-center gap-2 text-[13px] text-gray-400 mb-0.5">
+        <a href="{{ route('admin.dashboard') }}" wire:navigate class="hover:text-gray-600 transition-colors">Beranda</a>
+        <x-heroicon-m-chevron-right class="w-3 h-3" />
+        <span class="text-gray-500">Dashboard</span>
+    </nav>
+</x-slot>
+
 <div class="space-y-8">
     {{-- Stats Grid --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

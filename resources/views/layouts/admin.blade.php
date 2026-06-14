@@ -91,12 +91,16 @@
 
             {{-- Breadcrumb / title --}}
             <div class="flex-1">
-                <nav class="flex items-center gap-2 text-[13px] text-gray-400 mb-0.5">
-                    <span>Beranda</span>
-                    <x-heroicon-m-chevron-right class="w-3 h-3" />
-                    <span class="text-gray-500">Dashboard</span>
-                </nav>
-                <h1 class="text-xl font-bold text-gray-900 tracking-tight">Dashboard</h1>
+                @if(isset($breadcrumbs))
+                    {{ $breadcrumbs }}
+                @else
+                    <nav class="flex items-center gap-2 text-[13px] text-gray-400 mb-0.5">
+                        <a href="{{ route('admin.dashboard') }}" wire:navigate class="hover:text-gray-600 transition-colors">Beranda</a>
+                        <x-heroicon-m-chevron-right class="w-3 h-3" />
+                        <span class="text-gray-500">{{ $title ?? 'Dashboard' }}</span>
+                    </nav>
+                @endif
+                <h1 class="text-xl font-bold text-gray-900 tracking-tight">{{ $title ?? 'Dashboard' }}</h1>
             </div>
 
             {{-- Search Bar --}}
