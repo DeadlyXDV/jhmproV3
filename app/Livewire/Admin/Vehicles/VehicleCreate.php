@@ -31,8 +31,28 @@ class VehicleCreate extends Component
 
     public string $catatan = '';
 
+    /** @var array<int, string> */
+    public array $availableMerks = [];
+
+    /** @var array<int, string> */
+    public array $availableModels = [];
+
+    /** @var array<int, string> */
+    public array $availableTipes = [];
+
+    /** @var array<int, int|string> */
+    public array $availableYears = [];
+
     public function mount(?Vehicle $vehicle = null): void
     {
+        $this->availableMerks = Vehicle::whereNull('deleted_at')
+            ->distinct()
+            ->orderBy('merk')
+            ->pluck('merk')
+            ->filter()
+            ->values()
+            ->toArray();
+
         if ($vehicle && $vehicle->exists) {
             $this->vehicleId = $vehicle->id;
             $this->customerId = (string) $vehicle->customer_id;
@@ -45,7 +65,35 @@ class VehicleCreate extends Component
             $this->noMesin = $vehicle->no_mesin ?? '';
             $this->warna = $vehicle->warna ?? '';
             $this->catatan = $vehicle->catatan ?? '';
+
+            $this->reloadModels();
+            $this->reloadTipes();
+            $this->reloadYears();
         }
+    }
+
+    public function updatedMerk(): void
+    {
+        $this->model = '';
+        $this->tipe = '';
+        $this->tahun = '';
+        $this->reloadModels();
+        $this->availableTipes = [];
+        $this->availableYears = [];
+    }
+
+    public function updatedModel(): void
+    {
+        $this->tipe = '';
+        $this->tahun = '';
+        $this->reloadTipes();
+        $this->reloadYears();
+    }
+
+    public function updatedTipe(): void
+    {
+        $this->tahun = '';
+        $this->reloadYears();
     }
 
     public function save(): void
@@ -92,6 +140,50 @@ class VehicleCreate extends Component
             session()->flash('success', 'Kendaraan berhasil ditambahkan.');
             $this->redirect(route('admin.vehicles.show', $vehicle));
         }
+    }
+
+    private function reloadModels(): void
+    {
+        $this->availableModels = $this->merk
+            ? Vehicle::whereNull('deleted_at')
+                ->where('merk', $this->merk)
+                ->distinct()
+                ->orderBy('model')
+                ->pluck('model')
+                ->toArray()
+            : [];
+    }
+
+    private function reloadTipes(): void
+    {
+        $this->availableTipes = ($this->merk && $this->model)
+            ? Vehicle::whereNull('deleted_at')
+                ->where('merk', $this->merk)
+                ->where('model', $this->model)
+                ->whereNotNull('tipe')
+                ->distinct()
+                ->orderBy('tipe')
+                ->pluck('tipe')
+                ->toArray()
+            : [];
+    }
+
+    private function reloadYears(): void
+    {
+        if (! $this->merk || ! $this->model) {
+            $this->availableYears = [];
+
+            return;
+        }
+
+        $this->availableYears = Vehicle::whereNull('deleted_at')
+            ->where('merk', $this->merk)
+            ->where('model', $this->model)
+            ->when($this->tipe, fn ($q) => $q->where('tipe', $this->tipe))
+            ->distinct()
+            ->orderByDesc('tahun')
+            ->pluck('tahun')
+            ->toArray();
     }
 
     public function render(): View
