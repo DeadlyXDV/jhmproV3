@@ -72,15 +72,16 @@
                     <div class="relative" x-data="{ show: false }">
                         <input
                             id="password" name="password"
+                            type="password"
                             :type="show ? 'text' : 'password'"
                             required autocomplete="current-password"
                             class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm pr-10 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition"
                             placeholder="Password"
                         >
                         <button type="button" @click="show = !show"
-                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
-                            <x-heroicon-o-eye x-show="!show" class="w-4 h-4" />
-                            <x-heroicon-o-eye-slash x-show="show" x-cloak class="w-4 h-4" />
+                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer">
+                            <x-heroicon-o-eye x-show="!show" class="w-5 h-5" />
+                            <x-heroicon-o-eye-slash x-show="show" x-cloak class="w-5 h-5" />
                         </button>
                     </div>
                 </div>
