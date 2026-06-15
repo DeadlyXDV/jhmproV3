@@ -19,9 +19,17 @@
 
 ## CURRENT SESSION
 
-- **Sedang dikerjakan:** Selesai. Satu halaman login `/login` untuk semua tipe akun.
-- **File yang terakhir dimodifikasi:** `app/Providers/FortifyServiceProvider.php`, `app/Http/Responses/RoleBasedLoginResponse.php`, `routes/web.php`, `bootstrap/app.php`, layout blade files.
-- **Berhenti di:** Auth fully unified — `/login` (Fortify) dengan design admin login, dual-guard session, role-based redirect.
+- **Sedang dikerjakan:** Selesai implementasi semua Prioritas 4 — OrderIndex, RfmIndex, ReportIndex, SettingIndex, PosPage.
+- **File yang terakhir dimodifikasi:**
+  - `app/Livewire/Admin/Orders/OrderIndex.php` + view
+  - `app/Livewire/Admin/Rfm/RfmIndex.php` + view
+  - `app/Livewire/Admin/Reports/ReportIndex.php` + view
+  - `app/Livewire/Admin/Settings/SettingIndex.php` + view
+  - `app/Livewire/Admin/Pos/PosPage.php` + view
+  - `app/Models/Setting.php` (baru)
+  - `database/migrations/2026_06_15_214251_create_settings_table.php` (baru)
+  - `resources/views/layouts/pos.blade.php` (baru)
+- **Berhenti di:** Semua Prioritas 4 selesai. Test 29/30 pass, 1 skip, 0 fail. Sisanya: InvoiceCreate (masih stub), Seeder/fixture users, Test: admin login flow, Test: CRUD Customer.
 - **AI sebelumnya:** Claude
 
 ---
@@ -94,7 +102,7 @@ routes/web.php                             ← semua route (web + admin + mekani
 
 ## 6. Status Development
 
-**Fase saat ini:** Fase 1 (~99% selesai) | **Terakhir diperbarui:** 2026-06-15
+**Fase saat ini:** Fase 1 (~100% backend selesai) | **Terakhir diperbarui:** 2026-06-16
 
 ### SELESAI ✅
 
@@ -164,8 +172,12 @@ Semua item di bawah masih berupa **stub** (kelas kosong, view placeholder):
 - [x] `StockMovementIndex` — log read-only + search sparepart + filter tipe (in/out/adjustment)
 - [x] `ProductBundleIndex` — list + form tambah/edit + toggle aktif/bookable/online
 
-#### Prioritas 4 — Laporan & Lain-lain
-- [ ] `RfmIndex`, `ReportIndex`, `SettingIndex`, `OrderIndex`, `PosPage`
+#### Prioritas 4 — Laporan & Lain-lain ✅ SELESAI
+- [x] `OrderIndex` — list orders online shop, filter status + payment status
+- [x] `RfmIndex` — segmentasi RFM, tabs sumber, stat cards, filter cluster, tabel
+- [x] `ReportIndex` — laporan keuangan, filter tanggal + tipe, summary cards, tren 6 bulan
+- [x] `SettingIndex` — 4 tab: Profil Bengkel, Manajemen User (CRUD), Config Booking, Config RFM Cluster
+- [x] `PosPage` — kasir POS fullscreen: Walk-In (sparepart/servis) + Dari Work Order, keranjang, pembayaran, buat invoice
 
 #### Lain-lain
 - [ ] Seeder/fixture users (pastikan role + is_active benar)
@@ -185,6 +197,9 @@ Semua item di bawah masih berupa **stub** (kelas kosong, view placeholder):
 | Enum `source` booking diperluas | Tambah channel `whatsapp` dan `walk_in` selain website |
 | `CustomerRfm.$table = 'customer_rfm'` | Tabel di DB dibuat singular (bukan `customer_rfms`); wajib override agar Eloquent tidak cari tabel yang salah |
 | `RfmHistory.$table = 'rfm_history'` | Sama — tabel di DB singular `rfm_history`, bukan `rfm_histories` |
+| `Setting` model key-value (tabel `settings`) | Tidak ada tabel settings di DB awal; dibuat migration baru dengan PK `key` (string) untuk menyimpan config bengkel, booking, dll |
+| `PosPage` pakai `layouts/pos.blade.php` | POS fullscreen tanpa sidebar/topbar admin — layout terpisah sesuai plan |
+| `ReportIndex` trend: kondisional MySQL/PostgreSQL | `DATE_FORMAT` (MySQL) vs `TO_CHAR` (PostgreSQL) — auto-detect via `DB::getDriverName()` |
 
 ---
 
