@@ -19,9 +19,9 @@
 
 ## CURRENT SESSION
 
-- **Sedang dikerjakan:** Selesai. Gabungkan login customer & admin menjadi satu halaman (admin login).
-- **File yang terakhir dimodifikasi:** `app/Providers/FortifyServiceProvider.php`, `bootstrap/app.php`, `app/Http/Controllers/Admin/AuthController.php`, `resources/views/welcome.blade.php`, `tests/Feature/Auth/AuthenticationTest.php`, `tests/Feature/DashboardTest.php`
-- **Berhenti di:** Login sudah unified — `/login` redirect ke `/admin/login`. Admin login juga set web guard session.
+- **Sedang dikerjakan:** Selesai. Satu halaman login `/login` untuk semua tipe akun.
+- **File yang terakhir dimodifikasi:** `app/Providers/FortifyServiceProvider.php`, `app/Http/Responses/RoleBasedLoginResponse.php`, `routes/web.php`, `bootstrap/app.php`, layout blade files.
+- **Berhenti di:** Auth fully unified — `/login` (Fortify) dengan design admin login, dual-guard session, role-based redirect.
 - **AI sebelumnya:** Claude
 
 ---
