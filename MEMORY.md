@@ -19,10 +19,10 @@
 
 ## CURRENT SESSION
 
-- **Sedang dikerjakan:** Selesai perbaikan login page dan optimasi performa UI.
-- **File yang terakhir dimodifikasi:** `resources/views/admin/auth/login.blade.php`, `resources/css/app.css`, `resources/views/layouts/admin.blade.php`
-- **Berhenti di:** Implementasi final Dashboard, Sidebar, dan Login (Fix Password Toggle, CLS 0, No FOUC, Instant Navigation).
-- **AI sebelumnya:** Gemini
+- **Sedang dikerjakan:** Selesai. Gabungkan login customer & admin menjadi satu halaman (admin login).
+- **File yang terakhir dimodifikasi:** `app/Providers/FortifyServiceProvider.php`, `bootstrap/app.php`, `app/Http/Controllers/Admin/AuthController.php`, `resources/views/welcome.blade.php`, `tests/Feature/Auth/AuthenticationTest.php`, `tests/Feature/DashboardTest.php`
+- **Berhenti di:** Login sudah unified — `/login` redirect ke `/admin/login`. Admin login juga set web guard session.
+- **AI sebelumnya:** Claude
 
 ---
 
