@@ -3,10 +3,10 @@
 use App\Models\User;
 use Laravel\Fortify\Features;
 
-test('login screen can be rendered', function () {
+test('login screen redirects to admin login', function () {
     $response = $this->get(route('login'));
 
-    $response->assertOk();
+    $response->assertRedirect(route('admin.login'));
 });
 
 test('users can authenticate using the login screen', function () {

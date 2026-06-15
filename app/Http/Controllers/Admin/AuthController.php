@@ -53,6 +53,9 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
+        // Sync web guard session so Fortify-protected routes also work
+        Auth::guard('web')->loginUsingId($user->id, $request->boolean('remember'));
+
         // Redirect mekanik ke panel mekanik
         if ($user->role === 'mekanik') {
             return redirect()->route('mekanik.dashboard');
@@ -64,6 +67,7 @@ class AuthController extends Controller
     public function logout(Request $request): RedirectResponse
     {
         Auth::guard('admin')->logout();
+        Auth::guard('web')->logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
