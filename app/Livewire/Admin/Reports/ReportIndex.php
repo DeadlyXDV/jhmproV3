@@ -67,12 +67,16 @@ class ReportIndex extends Component
             : 0;
 
         $driver = DB::getDriverName();
-        $dateTrunc = $driver === 'pgsql'
-            ? "TO_CHAR(tanggal, 'YYYY-MM') as bulan"
-            : "DATE_FORMAT(tanggal, '%Y-%m') as bulan";
-        $groupBy = $driver === 'pgsql'
-            ? "TO_CHAR(tanggal, 'YYYY-MM')"
-            : "DATE_FORMAT(tanggal, '%Y-%m')";
+        if ($driver === 'pgsql') {
+            $dateTrunc = "TO_CHAR(tanggal, 'YYYY-MM') as bulan";
+            $groupBy = "TO_CHAR(tanggal, 'YYYY-MM')";
+        } elseif ($driver === 'sqlite') {
+            $dateTrunc = "strftime('%Y-%m', tanggal) as bulan";
+            $groupBy = "strftime('%Y-%m', tanggal)";
+        } else {
+            $dateTrunc = "DATE_FORMAT(tanggal, '%Y-%m') as bulan";
+            $groupBy = "DATE_FORMAT(tanggal, '%Y-%m')";
+        }
 
         $trenBulanan = Invoice::query()
             ->selectRaw("{$dateTrunc}, SUM(grand_total) as total")

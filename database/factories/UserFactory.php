@@ -46,5 +46,28 @@ class UserFactory extends Factory
     /**
      * Indicate that the model has two-factor authentication configured.
      */
-    public function withTwoFactor(): static {}
+    public function withTwoFactor(): static
+    {
+        return $this->state([]);
+    }
+
+    public function superAdmin(): static
+    {
+        return $this->state(fn (array $attributes) => ['role' => 'super_admin', 'is_active' => true]);
+    }
+
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => ['role' => 'admin', 'is_active' => true]);
+    }
+
+    public function mekanik(): static
+    {
+        return $this->state(fn (array $attributes) => ['role' => 'mekanik', 'is_active' => true]);
+    }
+
+    public function customer(): static
+    {
+        return $this->state(fn (array $attributes) => ['role' => 'customer', 'is_active' => true]);
+    }
 }

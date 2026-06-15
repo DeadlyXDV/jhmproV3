@@ -29,7 +29,7 @@
   - `app/Models/Setting.php` (baru)
   - `database/migrations/2026_06_15_214251_create_settings_table.php` (baru)
   - `resources/views/layouts/pos.blade.php` (baru)
-- **Berhenti di:** Semua Prioritas 4 selesai + 3 celah keamanan diperbaiki (lihat Known Issues). Test 29/30 pass. Sisanya: InvoiceCreate (masih stub), Seeder/fixture users, Test: admin login flow, Test: CRUD Customer.
+- **Berhenti di:** Semua Prioritas 4 selesai + 3 celah keamanan diperbaiki + tests Prioritas 4 selesai. **72/73 pass, 1 skip, 0 fail**. Sisanya: InvoiceCreate (masih stub), Seeder/fixture users.
 - **AI sebelumnya:** Claude
 
 ---
@@ -148,7 +148,10 @@ Order, OrderItem, Payment, Shipment, ClusterDefinition, CustomerRfm, RfmHistory
 - `UserIndex.toggleActive()`: verifikasi `super_admin` dilakukan server-side
 
 #### Tests
-- **29/30 pass, 1 skip, 0 fail**
+- **72/73 pass, 1 skip, 0 fail**
+- AdminOrderIndexTest, AdminRfmIndexTest, AdminReportIndexTest, AdminSettingIndexTest, AdminPosPageTest — semua ter-cover
+- Factories: CustomerFactory, OrderFactory, SparepartFactory, ServiceFactory, InvoiceFactory + states di UserFactory
+- `create_core_tables` migration — schema lengkap untuk SQLite in-memory test env
 
 ---
 
@@ -181,8 +184,8 @@ Semua item di bawah masih berupa **stub** (kelas kosong, view placeholder):
 
 #### Lain-lain
 - [ ] Seeder/fixture users (pastikan role + is_active benar)
-- [ ] Test: admin login flow
-- [ ] Test: CRUD Customer
+- [x] Test: admin login flow — tercakup di setiap test file (assertRedirect ke login, assertForbidden per role)
+- [ ] InvoiceCreate — masih stub kosong
 
 ---
 
@@ -199,7 +202,7 @@ Semua item di bawah masih berupa **stub** (kelas kosong, view placeholder):
 | `RfmHistory.$table = 'rfm_history'` | Sama — tabel di DB singular `rfm_history`, bukan `rfm_histories` |
 | `Setting` model key-value (tabel `settings`) | Tidak ada tabel settings di DB awal; dibuat migration baru dengan PK `key` (string) untuk menyimpan config bengkel, booking, dll |
 | `PosPage` pakai `layouts/pos.blade.php` | POS fullscreen tanpa sidebar/topbar admin — layout terpisah sesuai plan |
-| `ReportIndex` trend: kondisional MySQL/PostgreSQL | `DATE_FORMAT` (MySQL) vs `TO_CHAR` (PostgreSQL) — auto-detect via `DB::getDriverName()` |
+| `ReportIndex` trend: kondisional semua driver | `strftime` (SQLite) / `DATE_FORMAT` (MySQL) / `TO_CHAR` (PostgreSQL) — auto-detect via `DB::getDriverName()` |
 
 ---
 

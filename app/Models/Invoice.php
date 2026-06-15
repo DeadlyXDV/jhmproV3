@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -16,7 +18,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  * @property int $user_id
  * @property int|null $booking_id
  * @property string $invoice_number
- * @property \Illuminate\Support\Carbon $tanggal
+ * @property Carbon $tanggal
  * @property string $tipe
  * @property string|null $catatan
  * @property float $subtotal
@@ -27,6 +29,8 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  */
 class Invoice extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'vehicle_id', 'customer_id', 'partner_id', 'user_id', 'booking_id',
         'invoice_number', 'tanggal', 'tipe', 'catatan',

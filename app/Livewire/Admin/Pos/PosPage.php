@@ -277,6 +277,40 @@ class PosPage extends Component
         }
 
         DB::transaction(function () {
+            // Resolve canonical prices from DB before writing anything
+            $resolvedItems = [];
+            foreach ($this->cart as $item) {
+                abort_unless(in_array($item['tipe'], ['sparepart', 'service']), 422);
+
+                if ($item['tipe'] === 'sparepart') {
+                    $model = Sparepart::where('is_active', true)->findOrFail($item['id']);
+                    $resolvedItems[] = [
+                        'id' => $item['id'],
+                        'tipe' => 'sparepart',
+                        'qty' => $item['qty'],
+                        'harga' => (float) $model->harga_jual,
+                        'harga_beli' => (float) $model->harga_beli,
+                        'nama' => $model->item_name,
+                        'model' => $model,
+                    ];
+                } else {
+                    $model = Service::where('is_active', true)->findOrFail($item['id']);
+                    $resolvedItems[] = [
+                        'id' => $item['id'],
+                        'tipe' => 'service',
+                        'qty' => $item['qty'],
+                        'harga' => (float) $model->harga_default,
+                        'harga_beli' => 0,
+                        'nama' => $model->nama_service,
+                        'model' => null,
+                    ];
+                }
+            }
+
+            $canonicalSubtotal = array_sum(array_map(fn ($i) => $i['harga'] * $i['qty'], $resolvedItems));
+            $discount = (float) $this->discount;
+            $canonicalGrandTotal = max(0, $canonicalSubtotal - $discount);
+
             $invoice = Invoice::create([
                 'customer_id' => $this->customerId,
                 'user_id' => auth('admin')->id(),
@@ -284,41 +318,28 @@ class PosPage extends Component
                 'tanggal' => now(),
                 'tipe' => 'walk_in',
                 'catatan' => $this->catatan ?: null,
-                'subtotal' => $this->subtotal,
-                'discount' => (float) $this->discount,
-                'grand_total' => $this->grandTotal,
-                'payment_status' => $this->grandTotal <= (float) $this->jumlahBayar ? 'paid' : 'unpaid',
-                'amount_paid' => min((float) $this->jumlahBayar, $this->grandTotal),
+                'subtotal' => $canonicalSubtotal,
+                'discount' => $discount,
+                'grand_total' => $canonicalGrandTotal,
+                'payment_status' => $canonicalGrandTotal <= (float) $this->jumlahBayar ? 'paid' : 'unpaid',
+                'amount_paid' => min((float) $this->jumlahBayar, $canonicalGrandTotal),
             ]);
 
-            foreach ($this->cart as $item) {
-                abort_unless(in_array($item['tipe'], ['sparepart', 'service']), 422);
-
-                if ($item['tipe'] === 'sparepart') {
-                    $sparepart = Sparepart::where('is_active', true)->findOrFail($item['id']);
-                    $canonicalHarga = (float) $sparepart->harga_jual;
-                    $canonicalNama = $sparepart->item_name;
-                    $hargaBeli = (float) $sparepart->harga_beli;
-                } else {
-                    $service = Service::where('is_active', true)->findOrFail($item['id']);
-                    $canonicalHarga = (float) $service->harga_default;
-                    $canonicalNama = $service->nama_service;
-                    $hargaBeli = 0;
-                }
-
+            foreach ($resolvedItems as $item) {
                 InvoiceItem::create([
                     'invoice_id' => $invoice->id,
                     'service_id' => $item['tipe'] === 'service' ? $item['id'] : null,
                     'sparepart_id' => $item['tipe'] === 'sparepart' ? $item['id'] : null,
                     'type' => $item['tipe'],
-                    'nama_snapshot' => $canonicalNama,
+                    'nama_snapshot' => $item['nama'],
                     'qty' => $item['qty'],
-                    'harga_jual' => $canonicalHarga,
-                    'harga_beli_snapshot' => $hargaBeli,
-                    'subtotal' => $canonicalHarga * $item['qty'],
+                    'harga_jual' => $item['harga'],
+                    'harga_beli_snapshot' => $item['harga_beli'],
+                    'subtotal' => $item['harga'] * $item['qty'],
                 ]);
 
-                if ($item['tipe'] === 'sparepart') {
+                if ($item['tipe'] === 'sparepart' && $item['model']) {
+                    $sparepart = $item['model'];
                     $stockBefore = $sparepart->stock;
                     $sparepart->decrement('stock', $item['qty']);
                     StockMovement::create([

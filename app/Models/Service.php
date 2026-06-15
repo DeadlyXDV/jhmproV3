@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -15,6 +16,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Service extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'nama_service', 'deskripsi', 'harga_default', 'durasi_estimasi', 'is_active', 'is_bookable',
     ];
