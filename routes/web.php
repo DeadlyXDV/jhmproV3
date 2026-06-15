@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Livewire\Admin\Bookings\BookingCalendar;
 use App\Livewire\Admin\Bookings\BookingIndex;
 use App\Livewire\Admin\Customers\CustomerCreate;
@@ -41,15 +40,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 require __DIR__.'/settings.php';
 
-// ── ADMIN AUTH ────────────────────────────────────────────────────────────────
+// ── ADMIN ─────────────────────────────────────────────────────────────────────
 Route::prefix('admin')->name('admin.')->group(function () {
-
-    Route::middleware('guest:admin')->group(function () {
-        Route::get('/login', [AdminAuthController::class, 'loginForm'])->name('login');
-        Route::post('/login', [AdminAuthController::class, 'login'])->name('login.store');
-    });
-
-    Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
 
     // ── ADMIN + SUPER_ADMIN ───────────────────────────────────────────────────
     Route::middleware(['auth:admin', 'role:super_admin,admin'])->group(function () {

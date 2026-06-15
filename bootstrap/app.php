@@ -13,7 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->redirectGuestsTo(fn (Request $request) => route('admin.login'));
+        $middleware->redirectGuestsTo(fn (Request $request) => route('login'));
         $middleware->alias([
             'role' => CheckRole::class,
         ]);

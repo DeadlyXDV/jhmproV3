@@ -40,8 +40,8 @@
     <div class="flex-1 flex items-center justify-center p-8 bg-white">
         <div class="w-full max-w-sm">
             <div class="mb-8">
-                <h2 class="text-2xl font-bold text-gray-900">Masuk ke Panel Admin</h2>
-                <p class="text-sm text-gray-500 mt-1">Gunakan akun admin atau mekanik kamu</p>
+                <h2 class="text-2xl font-bold text-gray-900">Masuk ke JHMPro</h2>
+                <p class="text-sm text-gray-500 mt-1">Masukkan email dan password akun kamu</p>
             </div>
 
             @if ($errors->any())
@@ -50,7 +50,7 @@
             </div>
             @endif
 
-            <form method="POST" action="{{ route('admin.login.store') }}" class="space-y-5">
+            <form method="POST" action="{{ route('login') }}" class="space-y-5">
                 @csrf
 
                 <div>
