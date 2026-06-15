@@ -19,17 +19,17 @@
 
 ## CURRENT SESSION
 
-- **Sedang dikerjakan:** Selesai implementasi semua Prioritas 4 — OrderIndex, RfmIndex, ReportIndex, SettingIndex, PosPage.
+- **Sedang dikerjakan:** Selesai implementasi Prioritas 4 + security fix post-commit review.
 - **File yang terakhir dimodifikasi:**
   - `app/Livewire/Admin/Orders/OrderIndex.php` + view
   - `app/Livewire/Admin/Rfm/RfmIndex.php` + view
   - `app/Livewire/Admin/Reports/ReportIndex.php` + view
-  - `app/Livewire/Admin/Settings/SettingIndex.php` + view
-  - `app/Livewire/Admin/Pos/PosPage.php` + view
+  - `app/Livewire/Admin/Settings/SettingIndex.php` + view (+ auth fix)
+  - `app/Livewire/Admin/Pos/PosPage.php` + view (+ XSS + price manipulation fix)
   - `app/Models/Setting.php` (baru)
   - `database/migrations/2026_06_15_214251_create_settings_table.php` (baru)
   - `resources/views/layouts/pos.blade.php` (baru)
-- **Berhenti di:** Semua Prioritas 4 selesai. Test 29/30 pass, 1 skip, 0 fail. Sisanya: InvoiceCreate (masih stub), Seeder/fixture users, Test: admin login flow, Test: CRUD Customer.
+- **Berhenti di:** Semua Prioritas 4 selesai + 3 celah keamanan diperbaiki (lihat Known Issues). Test 29/30 pass. Sisanya: InvoiceCreate (masih stub), Seeder/fixture users, Test: admin login flow, Test: CRUD Customer.
 - **AI sebelumnya:** Claude
 
 ---
@@ -355,3 +355,6 @@ Semua item di bawah masih berupa **stub** (kelas kosong, view placeholder):
 | 🔍 Perlu verifikasi | UserIndex | Toggle active hanya diproteksi di server-side; pastikan UI tidak render tombol untuk non-super_admin | `77c3f8f` |
 | ✅ Fixed | CustomerRfm | Tabel DB bernama `customer_rfm` (singular) — sudah ditambahkan `$table = 'customer_rfm'` di model | session 2026-06-15 |
 | ✅ Fixed | RfmHistory | Tabel DB bernama `rfm_history` (singular) — sudah ditambahkan `$table = 'rfm_history'` di model | session 2026-06-15 |
+| ✅ Fixed | PosPage | XSS: `addslashes()` diganti `Js::from()` di 3 titik `wire:click` pada blade POS | `d856758` |
+| ✅ Fixed | PosPage | Price manipulation: `addToCart()` sekarang hanya terima `$id`+`$tipe`, harga/nama di-resolve dari DB; `buatInvoice()` juga re-resolve canonical price | `d856758` |
+| ✅ Fixed | SettingIndex | Missing auth: `openUserCreate/Edit()` kini dilindungi `abort_unless(isSuperAdmin())` + `abort_if(super_admin)` | `d856758` |
