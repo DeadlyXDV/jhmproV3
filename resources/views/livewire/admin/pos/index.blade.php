@@ -105,7 +105,7 @@
                             @if(!empty($customerSuggestions))
                                 <div class="absolute top-full mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg z-30 overflow-hidden">
                                     @foreach($customerSuggestions as $cs)
-                                        <button wire:click="selectCustomer({{ $cs['id'] }}, '{{ addslashes($cs['nama']) }}')"
+                                        <button wire:click="selectCustomer({{ $cs['id'] }}, {{ Js::from($cs['nama']) }})"
                                             class="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 text-left transition-colors">
                                             <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-600 text-xs font-bold flex items-center justify-center flex-none">
                                                 {{ substr($cs['nama'], 0, 1) }}
@@ -179,7 +179,7 @@
                         @if(!empty($woSuggestions))
                             <div class="mt-2 space-y-2">
                                 @foreach($woSuggestions as $wo)
-                                    <button wire:click="selectWo({{ $wo['id'] }}, '{{ addslashes($wo['label']) }}')"
+                                    <button wire:click="selectWo({{ $wo['id'] }}, {{ Js::from($wo['label']) }})"
                                         class="w-full text-left p-3 border border-gray-200 rounded-xl hover:border-red-300 hover:bg-red-50/50 transition-all">
                                         <div class="flex items-center justify-between mb-1">
                                             <span class="text-xs font-bold text-red-600">{{ $wo['wo_number'] }}</span>
@@ -242,7 +242,7 @@
                                     </div>
                                     <span class="text-sm font-semibold text-gray-700">Rp {{ number_format($item['harga'], 0, ',', '.') }}</span>
                                     @if(!$habis)
-                                        <button wire:click="addToCart({{ $item['id'] }}, '{{ addslashes($item['nama']) }}', {{ $item['harga'] }}, '{{ $item['tipe'] }}')"
+                                        <button wire:click="addToCart({{ $item['id'] }}, {{ Js::from($item['tipe']) }})"
                                             class="w-8 h-8 rounded-xl bg-red-600 text-white flex items-center justify-center hover:bg-red-700 transition-colors flex-none">
                                             <x-heroicon-o-plus class="w-4 h-4" />
                                         </button>

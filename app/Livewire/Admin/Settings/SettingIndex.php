@@ -148,13 +148,16 @@ class SettingIndex extends Component
 
     public function openUserCreate(): void
     {
+        abort_unless(auth('admin')->user()?->isSuperAdmin(), 403);
         $this->resetUserForm();
         $this->showUserForm = true;
     }
 
     public function openUserEdit(int $userId): void
     {
+        abort_unless(auth('admin')->user()?->isSuperAdmin(), 403);
         $user = User::findOrFail($userId);
+        abort_if($user->role === 'super_admin', 403);
         $this->editingUserId = $userId;
         $this->userName = $user->name;
         $this->userEmail = $user->email;

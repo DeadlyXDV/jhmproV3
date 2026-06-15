@@ -145,8 +145,20 @@ class PosPage extends Component
         }
     }
 
-    public function addToCart(int $id, string $nama, float $harga, string $tipe): void
+    public function addToCart(int $id, string $tipe): void
     {
+        abort_unless(in_array($tipe, ['sparepart', 'service']), 422);
+
+        if ($tipe === 'sparepart') {
+            $model = Sparepart::where('is_active', true)->findOrFail($id);
+            $nama = $model->item_name;
+            $harga = (float) $model->harga_jual;
+        } else {
+            $model = Service::where('is_active', true)->findOrFail($id);
+            $nama = $model->nama_service;
+            $harga = (float) $model->harga_default;
+        }
+
         foreach ($this->cart as $i => $item) {
             if ($item['id'] === $id && $item['tipe'] === $tipe) {
                 $this->cart[$i]['qty']++;
@@ -280,36 +292,45 @@ class PosPage extends Component
             ]);
 
             foreach ($this->cart as $item) {
+                abort_unless(in_array($item['tipe'], ['sparepart', 'service']), 422);
+
+                if ($item['tipe'] === 'sparepart') {
+                    $sparepart = Sparepart::where('is_active', true)->findOrFail($item['id']);
+                    $canonicalHarga = (float) $sparepart->harga_jual;
+                    $canonicalNama = $sparepart->item_name;
+                    $hargaBeli = (float) $sparepart->harga_beli;
+                } else {
+                    $service = Service::where('is_active', true)->findOrFail($item['id']);
+                    $canonicalHarga = (float) $service->harga_default;
+                    $canonicalNama = $service->nama_service;
+                    $hargaBeli = 0;
+                }
+
                 InvoiceItem::create([
                     'invoice_id' => $invoice->id,
                     'service_id' => $item['tipe'] === 'service' ? $item['id'] : null,
                     'sparepart_id' => $item['tipe'] === 'sparepart' ? $item['id'] : null,
                     'type' => $item['tipe'],
-                    'nama_snapshot' => $item['nama'],
+                    'nama_snapshot' => $canonicalNama,
                     'qty' => $item['qty'],
-                    'harga_jual' => $item['harga'],
-                    'harga_beli_snapshot' => $item['tipe'] === 'sparepart'
-                        ? (float) (Sparepart::find($item['id'])?->harga_beli ?? 0)
-                        : 0,
-                    'subtotal' => $item['harga'] * $item['qty'],
+                    'harga_jual' => $canonicalHarga,
+                    'harga_beli_snapshot' => $hargaBeli,
+                    'subtotal' => $canonicalHarga * $item['qty'],
                 ]);
 
                 if ($item['tipe'] === 'sparepart') {
-                    $sparepart = Sparepart::find($item['id']);
-                    if ($sparepart) {
-                        $stockBefore = $sparepart->stock;
-                        $sparepart->decrement('stock', $item['qty']);
-                        StockMovement::create([
-                            'sparepart_id' => $sparepart->id,
-                            'user_id' => auth('admin')->id(),
-                            'type' => 'out',
-                            'qty' => $item['qty'],
-                            'stock_before' => $stockBefore,
-                            'stock_after' => $stockBefore - $item['qty'],
-                            'reference_type' => Invoice::class,
-                            'reference_id' => $invoice->id,
-                        ]);
-                    }
+                    $stockBefore = $sparepart->stock;
+                    $sparepart->decrement('stock', $item['qty']);
+                    StockMovement::create([
+                        'sparepart_id' => $sparepart->id,
+                        'user_id' => auth('admin')->id(),
+                        'type' => 'out',
+                        'qty' => $item['qty'],
+                        'stock_before' => $stockBefore,
+                        'stock_after' => $stockBefore - $item['qty'],
+                        'reference_type' => Invoice::class,
+                        'reference_id' => $invoice->id,
+                    ]);
                 }
             }
 
