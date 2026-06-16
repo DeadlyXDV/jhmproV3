@@ -14,7 +14,7 @@ class RfmHistory extends Model
     protected $fillable = [
         'customer_id', 'source', 'year_month',
         'recency_days', 'frequency', 'monetary',
-        'cluster_id', 'cluster_label',
+        'cluster_id', 'cluster_label', 'created_at',
     ];
 
     protected function casts(): array

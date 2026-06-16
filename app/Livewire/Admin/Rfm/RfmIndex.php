@@ -7,6 +7,7 @@ use App\Models\CustomerRfm;
 use Illuminate\View\View;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class RfmIndex extends Component
 {
@@ -32,6 +33,41 @@ class RfmIndex extends Component
     public function updatedSearch(): void
     {
         $this->resetPage();
+    }
+
+    public function exportCsv(): StreamedResponse
+    {
+        $query = CustomerRfm::query()
+            ->with('customer')
+            ->where('source', $this->activeSource)
+            ->when($this->filterCluster, fn ($q) => $q->where('cluster_label', $this->filterCluster))
+            ->when($this->search, fn ($q) => $q->whereHas('customer', fn ($r) => $r->where('nama', 'like', "%{$this->search}%")))
+            ->orderByDesc('rfm_score')
+            ->get();
+
+        $filename = 'rfm_'.$this->activeSource.($this->filterCluster ? '_'.$this->filterCluster : '').'_'.now()->format('Ymd').'.csv';
+
+        return response()->streamDownload(function () use ($query) {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['Nama', 'No HP', 'Email', 'Segmen', 'R Score', 'F Score', 'M Score', 'RFM Score', 'Recency (hari)', 'Frequency', 'Monetary', 'Dihitung Pada']);
+            foreach ($query as $row) {
+                fputcsv($handle, [
+                    $row->customer?->nama ?? '-',
+                    $row->customer?->no_hp ?? '-',
+                    $row->customer?->email ?? '-',
+                    $row->cluster_label,
+                    $row->r_score,
+                    $row->f_score,
+                    $row->m_score,
+                    $row->rfm_score,
+                    $row->recency_days,
+                    $row->frequency,
+                    $row->monetary,
+                    $row->calculated_at,
+                ]);
+            }
+            fclose($handle);
+        }, $filename, ['Content-Type' => 'text/csv']);
     }
 
     public function render(): View

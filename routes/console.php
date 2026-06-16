@@ -9,3 +9,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('booking:generate-slots')->daily();
+Schedule::command('rfm:calculate')->dailyAt('00:00');

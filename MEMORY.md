@@ -19,28 +19,16 @@
 
 ## CURRENT SESSION
 
-- **Sedang dikerjakan:** Fase 3 — Booking Online.
+- **Sedang dikerjakan:** Fase 5 — RFM & Analitik (SELESAI).
 - **File yang terakhir dimodifikasi:**
-  - `app/Console/Commands/GenerateBookingSlots.php` — Artisan command `booking:generate-slots` — generate slot berdasarkan setting kapasitas + hari operasional
-  - `app/Livewire/Website/Booking/BookingPage.php` — halaman booking 3-step (kendaraan → tanggal → konfirmasi) dengan race condition protection via lockForUpdate
-  - `app/Livewire/Admin/Bookings/BookingIndex.php` — tambah `createInvoice(int $id)` — redirect ke InvoiceCreate dengan from_booking param
-  - `app/Livewire/Admin/Invoices/InvoiceCreate.php` — tambah `mount()` — auto-load booking jika ada query param `from_booking`
-  - `app/Models/Customer.php` — tambah `user_id` fillable + `user()` belongsTo relation
-  - `app/Models/User.php` — tambah `customer()` hasOne relation
-  - `app/Models/Booking.php` — tambah `HasFactory` trait
-  - `app/Models/BookingSlot.php` — hapus cast `tanggal` => `date` (biar string agar where('tanggal', 'Y-m-d') bekerja di SQLite)
-  - `database/factories/BookingFactory.php` — factory baru dengan states `confirmed()` + `cancelled()`
-  - `database/migrations/2026_06_17_000001_add_user_id_to_customers_table.php` — alter migration production
-  - `database/migrations/2026_06_15_222816_create_core_tables.php` — tambah `user_id` ke `customers` table (untuk SQLite test)
-  - `resources/views/livewire/website/booking/booking-page.blade.php` — Blade view 3-step booking form
-  - `resources/views/website/booking/success.blade.php` — halaman sukses booking
-  - `resources/views/layouts/app/sidebar.blade.php` — tambah link "Booking Servis" di sidebar customer
-  - `routes/web.php` — tambah route `/booking` + `/booking/success`
-  - `routes/console.php` — daftarkan schedule `booking:generate-slots` daily
-  - `tests/Feature/GenerateBookingSlotsCommandTest.php` — 4 tests untuk command
-  - `tests/Feature/WebsiteBookingPageTest.php` — 9 tests untuk BookingPage
-  - `tests/Feature/AdminBookingIndexTest.php` — 7 tests untuk BookingIndex admin
-- **Berhenti di:** **Fase 3 selesai 100%**. Tests: **115/115 pass, 1 skip, 0 fail**. Siap lanjut Fase 4.
+  - `app/Console/Commands/CalculateRfm.php` — Artisan command `rfm:calculate` — K-Means inline (tanpa library), quintile scoring, UPSERT customer_rfm + append rfm_history
+  - `app/Models/RfmHistory.php` — tambah `created_at` ke `$fillable`
+  - `app/Livewire/Admin/Rfm/RfmIndex.php` — tambah `exportCsv()` — download CSV per source/segmen
+  - `app/Livewire/Admin/Settings/SettingIndex.php` — tambah `rfmKClusters`, `rfmWeightR/F/M`, `rfmPeriodMonths` + method `saveRfmConfig()`
+  - `database/seeders/ClusterDefinitionSeeder.php` — seed 5 cluster default (Champion, Loyal, Potential, At Risk, Lost)
+  - `routes/console.php` — tambah schedule `rfm:calculate` daily at 00:00
+  - `tests/Feature/CalculateRfmCommandTest.php` — 9 tests untuk command
+- **Berhenti di:** **Fase 5 selesai 100%**. Tests: **124/124 pass (123 passed, 1 skip), 0 fail**. Fase 4 di-skip. Siap lanjut Fase 6.
 - **AI sebelumnya:** Claude
 
 ---
@@ -113,7 +101,7 @@ routes/web.php                             ← semua route (web + admin + mekani
 
 ## 6. Status Development
 
-**Fase saat ini:** Fase 3 SELESAI 100% · Fase 4–6 belum dimulai | **Terakhir diperbarui:** 2026-06-17
+**Fase saat ini:** Fase 5 SELESAI 100% · Fase 4 DI-SKIP · Fase 6 belum dimulai | **Terakhir diperbarui:** 2026-06-17
 
 > **Sumber kebenaran rencana lengkap:** `/home/voldemort/Downloads/plan.md` (4092 baris). Path ini hanya bisa diakses di mesin developer — tidak bisa diakses AI lain.
 
@@ -217,12 +205,13 @@ Order, OrderItem, Payment, Shipment, ClusterDefinition, CustomerRfm, RfmHistory,
 
 ---
 
-### ⏳ FASE 5 — RFM & ANALITIK (Belum Dimulai)
+### ✅ FASE 5 — RFM & ANALITIK (Selesai)
 
-- [ ] **Scheduled job RFM** (daily 00:00) — hitung recency/frequency/monetary per customer per source
-- [ ] **K-Means clustering** (`php-ml`) — assign cluster ke setiap customer
-- [ ] **Badge segmen** di profil customer (website publik)
-- [ ] **Export CSV per segmen** dari RfmIndex
+- [x] **Scheduled job RFM** (daily 00:00) — `rfm:calculate` command; hitung R/F/M per customer, sumber `bengkel` + `combined`
+- [x] **K-Means clustering** (inline PHP, tanpa library) — assign cluster ke setiap customer; label berdasarkan centroid sum ranking
+- [x] **Export CSV per segmen** dari RfmIndex — `exportCsv()` di RfmIndex, filter by source + cluster
+- [x] **Config RFM** — `k_clusters`, `weight_r/f/m`, `period_months` via SettingIndex (super_admin only)
+- [ ] **Badge segmen** di profil customer (website publik) — ditunda ke Fase 6
 
 ---
 

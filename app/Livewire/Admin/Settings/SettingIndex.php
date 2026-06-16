@@ -51,7 +51,17 @@ class SettingIndex extends Component
     /** @var array<int, bool> */
     public array $bookingHari = [1 => true, 2 => true, 3 => true, 4 => true, 5 => true, 6 => true, 7 => false];
 
-    // Config RFM Cluster
+    // Config RFM
+    public int $rfmKClusters = 5;
+
+    public float $rfmWeightR = 0.3;
+
+    public float $rfmWeightF = 0.3;
+
+    public float $rfmWeightM = 0.4;
+
+    public int $rfmPeriodMonths = 12;
+
     /** @var array<int, array{label: string, description: string, color_hex: string}> */
     public array $clusters = [];
 
@@ -76,6 +86,12 @@ class SettingIndex extends Component
         if ($savedHari) {
             $this->bookingHari = json_decode($savedHari, true);
         }
+
+        $this->rfmKClusters = (int) Setting::get('rfm_k_clusters', 5);
+        $this->rfmWeightR = (float) Setting::get('rfm_weight_r', 0.3);
+        $this->rfmWeightF = (float) Setting::get('rfm_weight_f', 0.3);
+        $this->rfmWeightM = (float) Setting::get('rfm_weight_m', 0.4);
+        $this->rfmPeriodMonths = (int) Setting::get('rfm_period_months', 12);
 
         foreach (ClusterDefinition::orderBy('id')->get() as $cluster) {
             $this->clusters[$cluster->id] = [
@@ -123,6 +139,27 @@ class SettingIndex extends Component
         Setting::set('booking_kapasitas', (string) $this->bookingKapasitas);
         Setting::set('booking_advance_days', (string) $this->bookingAdvanceDays);
         Setting::set('booking_hari', json_encode($this->bookingHari));
+
+        $this->showSuccessMessage = true;
+    }
+
+    public function saveRfmConfig(): void
+    {
+        abort_unless(auth('admin')->user()?->isSuperAdmin(), 403);
+
+        $this->validate([
+            'rfmKClusters' => 'required|integer|min:2|max:10',
+            'rfmWeightR' => 'required|numeric|min:0|max:1',
+            'rfmWeightF' => 'required|numeric|min:0|max:1',
+            'rfmWeightM' => 'required|numeric|min:0|max:1',
+            'rfmPeriodMonths' => 'required|integer|min:1|max:60',
+        ]);
+
+        Setting::set('rfm_k_clusters', (string) $this->rfmKClusters);
+        Setting::set('rfm_weight_r', (string) $this->rfmWeightR);
+        Setting::set('rfm_weight_f', (string) $this->rfmWeightF);
+        Setting::set('rfm_weight_m', (string) $this->rfmWeightM);
+        Setting::set('rfm_period_months', (string) $this->rfmPeriodMonths);
 
         $this->showSuccessMessage = true;
     }
