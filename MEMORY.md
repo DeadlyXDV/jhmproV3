@@ -12,24 +12,21 @@
 
 | AI | Scope | DILARANG menyentuh |
 |---|---|---|
-| **Claude** | Backend PHP: Models, Controllers, Livewire component class (`.php`), Migrations, Routes, Tests, Auth | File Blade/view murni yang sudah dikerjakan Gemini, aset CSS/JS murni |
-| **Gemini** | Frontend: file Blade (`.blade.php`), Tailwind class di view, komponen UI, layout, design system | File `.php` (Model, Controller, Livewire class), Migrations, Routes, Tests |
+| **Claude** | Backend PHP: Models, Controllers, Livewire component class (`.php`), Migrations, Routes, Tests, Auth | File Blade/view murni yang sudah dikerjakan Antigravity, aset CSS/JS murni |
+| **Antigravity** | Frontend: file Blade (`.blade.php`), Tailwind class di view, komponen UI, layout, design system | File `.php` (Model, Controller, Livewire class), Migrations, Routes, Tests |
 
 ---
 
 ## CURRENT SESSION
 
-- **Sedang dikerjakan:** Selesai implementasi Prioritas 4 + security fix post-commit review.
+- **Sedang dikerjakan:** Selesai implementasi InvoiceCreate + UserSeeder (sisa Fase 1).
 - **File yang terakhir dimodifikasi:**
-  - `app/Livewire/Admin/Orders/OrderIndex.php` + view
-  - `app/Livewire/Admin/Rfm/RfmIndex.php` + view
-  - `app/Livewire/Admin/Reports/ReportIndex.php` + view
-  - `app/Livewire/Admin/Settings/SettingIndex.php` + view (+ auth fix)
-  - `app/Livewire/Admin/Pos/PosPage.php` + view (+ XSS + price manipulation fix)
-  - `app/Models/Setting.php` (baru)
-  - `database/migrations/2026_06_15_214251_create_settings_table.php` (baru)
-  - `resources/views/layouts/pos.blade.php` (baru)
-- **Berhenti di:** Semua Prioritas 4 selesai + 3 celah keamanan diperbaiki + tests Prioritas 4 selesai. **72/73 pass, 1 skip, 0 fail**. Sisanya: InvoiceCreate (masih stub), Seeder/fixture users.
+  - `app/Livewire/Admin/Invoices/InvoiceCreate.php` — full implementation
+  - `resources/views/livewire/admin/invoices/create.blade.php` — full view
+  - `database/seeders/UserSeeder.php` — baru (3 user: super_admin, admin, mekanik)
+  - `database/seeders/DatabaseSeeder.php` — panggil UserSeeder
+  - `tests/Feature/AdminInvoiceCreateTest.php` — 20 tests baru
+- **Berhenti di:** **Fase 1 selesai 100%**. Tests: **92/93 pass, 1 skip, 0 fail**. User diminta testing sebelum lanjut.
 - **AI sebelumnya:** Claude
 
 ---
@@ -102,90 +99,143 @@ routes/web.php                             ← semua route (web + admin + mekani
 
 ## 6. Status Development
 
-**Fase saat ini:** Fase 1 (~100% backend selesai) | **Terakhir diperbarui:** 2026-06-16
+**Fase saat ini:** Fase 1 SELESAI 100% · Fase 2–6 belum dimulai | **Terakhir diperbarui:** 2026-06-16
 
-### SELESAI ✅
+> **Sumber kebenaran rencana lengkap:** `/home/voldemort/Downloads/plan.md` (4092 baris). Path ini hanya bisa diakses di mesin developer — tidak bisa diakses AI lain.
+
+---
+
+### ✅ FASE 1 — FONDASI (Hampir Selesai)
 
 #### Database / Migrasi
 - `bookings.source`: ubah enum → `('website','whatsapp','walk_in')`
 - `bookings.status`: tambah nilai `'in_progress'`
 - `work_orders.wo_number`: kolom baru format `WO-NNNN`
+- `settings` tabel baru (key-value store, PK = `key`)
 - Semua alter migrations diproteksi SQLite guard untuk test compatibility
+- `create_core_tables` migration untuk SQLite in-memory test env
 
 #### Models (semua ada di `app/Models/`)
 User, Customer, Partner, Vehicle, VehicleEngineSpec, VehicleModificationLog,
 Service, Invoice, InvoiceItem, WorkOrder, Booking, BookingService, BookingSlot,
 Sparepart, SparepartCategory, StockMovement, ProductBundle, ProductBundleItem,
-Order, OrderItem, Payment, Shipment, ClusterDefinition, CustomerRfm, RfmHistory
+Order, OrderItem, Payment, Shipment, ClusterDefinition, CustomerRfm, RfmHistory, Setting
 
 #### Observer
 - `VehicleObserver`: auto-create `vehicle_engine_specs` saat kendaraan dibuat — terdaftar di `AppServiceProvider`
 
-#### Livewire — Sudah Implementasi Penuh
+#### Livewire Admin Panel — Sudah Implementasi Penuh
 | Komponen | Path |
 |---|---|
 | AdminDashboard | `app/Livewire/Admin/Dashboard.php` |
-| CustomerIndex | `app/Livewire/Admin/Customers/CustomerIndex.php` |
-| CustomerCreate | `app/Livewire/Admin/Customers/CustomerCreate.php` |
-| CustomerDetail | `app/Livewire/Admin/Customers/CustomerDetail.php` |
+| CustomerIndex/Create/Detail | `app/Livewire/Admin/Customers/` |
 | PartnerIndex | `app/Livewire/Admin/Partners/PartnerIndex.php` |
-| VehicleIndex | `app/Livewire/Admin/Vehicles/VehicleIndex.php` |
-| VehicleDetail | `app/Livewire/Admin/Vehicles/VehicleDetail.php` |
-| VehicleCreate | `app/Livewire/Admin/Vehicles/VehicleCreate.php` |
+| VehicleIndex/Create/Detail | `app/Livewire/Admin/Vehicles/` |
 | UserIndex | `app/Livewire/Admin/Users/UserIndex.php` |
+| WorkOrderIndex + WorkOrderDetail | `app/Livewire/Admin/WorkOrders/` |
+| InvoiceIndex + InvoiceDetail | `app/Livewire/Admin/Invoices/` |
+| BookingIndex + BookingCalendar | `app/Livewire/Admin/Bookings/` |
+| ServiceIndex | `app/Livewire/Admin/Services/ServiceIndex.php` |
+| SparepartCategoryIndex | `app/Livewire/Admin/SparepartCategories/` |
+| SparepartIndex | `app/Livewire/Admin/Spareparts/SparepartIndex.php` |
+| StockMovementIndex | `app/Livewire/Admin/StockMovements/StockMovementIndex.php` |
+| ProductBundleIndex | `app/Livewire/Admin/ProductBundles/ProductBundleIndex.php` |
+| OrderIndex | `app/Livewire/Admin/Orders/OrderIndex.php` |
+| RfmIndex | `app/Livewire/Admin/Rfm/RfmIndex.php` |
+| ReportIndex | `app/Livewire/Admin/Reports/ReportIndex.php` |
+| SettingIndex | `app/Livewire/Admin/Settings/SettingIndex.php` |
+| PosPage | `app/Livewire/Admin/Pos/PosPage.php` |
+
+#### Livewire Mekanik Panel — Sudah Implementasi Penuh
+| Komponen | Path |
+|---|---|
 | MekanikDashboard | `app/Livewire/Mekanik/Dashboard.php` |
 | MekanikWorkOrderIndex | `app/Livewire/Mekanik/WorkOrders/WorkOrderIndex.php` |
-| WorkOrderIndex (admin) | `app/Livewire/Admin/WorkOrders/WorkOrderIndex.php` |
-| WorkOrderDetail (admin) | `app/Livewire/Admin/WorkOrders/WorkOrderDetail.php` |
 | MekanikWorkOrderDetail | `app/Livewire/Mekanik/WorkOrders/MekanikWorkOrderDetail.php` |
-| InvoiceIndex | `app/Livewire/Admin/Invoices/InvoiceIndex.php` |
-| InvoiceDetail | `app/Livewire/Admin/Invoices/InvoiceDetail.php` |
-| BookingIndex | `app/Livewire/Admin/Bookings/BookingIndex.php` |
-| BookingCalendar | `app/Livewire/Admin/Bookings/BookingCalendar.php` |
-| ServiceIndex | `app/Livewire/Admin/Services/ServiceIndex.php` |
 
 #### Security
 - `UserIndex.toggleActive()`: verifikasi `super_admin` dilakukan server-side
+- `PosPage.addToCart()`: harga resolve dari DB, bukan dari client
+- `SettingIndex.openUserCreate/Edit()`: dilindungi `abort_unless(isSuperAdmin())`
 
 #### Tests
 - **72/73 pass, 1 skip, 0 fail**
-- AdminOrderIndexTest, AdminRfmIndexTest, AdminReportIndexTest, AdminSettingIndexTest, AdminPosPageTest — semua ter-cover
-- Factories: CustomerFactory, OrderFactory, SparepartFactory, ServiceFactory, InvoiceFactory + states di UserFactory
-- `create_core_tables` migration — schema lengkap untuk SQLite in-memory test env
+- Factories: CustomerFactory, OrderFactory, SparepartFactory, ServiceFactory, InvoiceFactory + states di UserFactory (superAdmin/admin/mekanik/customer)
+
+#### ✅ Fase 1 SELESAI 100%
+
+- [x] **`InvoiceCreate`** — implementasi penuh: tipe (walk_in/booking/partner), customer search + inline baru, kendaraan dropdown, repeater items (service/sparepart, qty + harga override), discount, payment (metode + jumlah), post-save: stok berkurang + stock_movements, redirect ke detail
+- [x] **Seeder users** — `UserSeeder`: super_admin@jhmpro.test, admin@jhmpro.test, mekanik@jhmpro.test (semua password: `password`)
 
 ---
 
-### BELUM SELESAI — HARUS DILANJUTKAN ⏳
+### ⏳ FASE 2 — OPERASIONAL BENGKEL (Belum Dimulai)
 
-Semua item di bawah masih berupa **stub** (kelas kosong, view placeholder):
+- [ ] Stock movement **observer/event** otomatis saat invoice tersimpan (sekarang manual di PosPage)
+- [ ] Alert **stok minimum** di dashboard — tampilkan sparepart dengan `stock <= minimum_stock`
+- [ ] **Modification log** otomatis saat spek mesin di VehicleDetail diupdate
+- [ ] **Laporan keuangan lebih lengkap** — export CSV/PDF
 
-#### Prioritas 1 — Inti Operasional ✅ SELESAI
-- [x] `WorkOrderIndex` (admin) + `WorkOrderDetail` (admin)
-- [x] `MekanikWorkOrderDetail`
-- [x] `InvoiceIndex` + `InvoiceDetail` (InvoiceCreate masih stub)
+---
 
-#### Prioritas 2 ✅ SELESAI
-- [x] `BookingIndex` — tabel + search + filter status/channel + confirm/cancel inline
-- [x] `BookingCalendar` — grid bulan, navigasi prev/next, booking per hari dengan dot warna status
-- [x] `ServiceIndex` — tabel + toggle aktif/bookable + form tambah/edit inline
+### ⏳ FASE 3 — BOOKING ONLINE (Belum Dimulai)
 
-#### Prioritas 3 ✅ SELESAI
-- [x] `SparepartCategoryIndex` — list + form tambah/edit inline + parent category + slug auto-generate
-- [x] `SparepartIndex` — tabel + search (SKU/nama/brand) + filter kategori + filter stok kritis + toggle aktif
-- [x] `StockMovementIndex` — log read-only + search sparepart + filter tipe (in/out/adjustment)
-- [x] `ProductBundleIndex` — list + form tambah/edit + toggle aktif/bookable/online
+Semua di bawah adalah **Website Publik** (guard `web`, customer-facing):
 
-#### Prioritas 4 — Laporan & Lain-lain ✅ SELESAI
-- [x] `OrderIndex` — list orders online shop, filter status + payment status
-- [x] `RfmIndex` — segmentasi RFM, tabs sumber, stat cards, filter cluster, tabel
-- [x] `ReportIndex` — laporan keuangan, filter tanggal + tipe, summary cards, tren 6 bulan
-- [x] `SettingIndex` — 4 tab: Profil Bengkel, Manajemen User (CRUD), Config Booking, Config RFM Cluster
-- [x] `PosPage` — kasir POS fullscreen: Walk-In (sparepart/servis) + Dari Work Order, keranjang, pembayaran, buat invoice
+- [ ] **Booking slot generator** — Artisan Command untuk generate `booking_slots` harian berdasarkan kapasitas + hari operasional dari `settings`
+- [ ] **Halaman booking publik** `/booking` — 3 step: pilih kendaraan → pilih tanggal/slot → konfirmasi
+- [ ] **Integrasi booking → invoice + WO** — saat admin konfirmasi booking, bisa langsung buat invoice dan WO
 
-#### Lain-lain
-- [ ] Seeder/fixture users (pastikan role + is_active benar)
-- [x] Test: admin login flow — tercakup di setiap test file (assertRedirect ke login, assertForbidden per role)
-- [ ] InvoiceCreate — masih stub kosong
+---
+
+### ⏳ FASE 4 — ONLINE SHOP & PAYMENT (Belum Dimulai)
+
+- [ ] **Katalog produk publik** `/shop` — sparepart + bundle WHERE `is_sold_online = true`
+- [ ] **Detail produk** `/shop/{slug}`
+- [ ] **Keranjang belanja** (Livewire, session-based atau DB)
+- [ ] **Checkout** → buat `Order` + `OrderItems`
+- [ ] **Integrasi Midtrans Snap** — generate snap_token, redirect ke payment page
+- [ ] **Webhook Midtrans** — update `payment_status` order/invoice saat pembayaran berhasil
+- [ ] **Integrasi Shipbite** — hitung ongkir, buat shipment, dapat tracking number
+- [ ] **Webhook Shipbite** — update status pengiriman
+- [ ] **Halaman tracking order** `/orders/{id}` di akun customer
+
+---
+
+### ⏳ FASE 5 — RFM & ANALITIK (Belum Dimulai)
+
+- [ ] **Scheduled job RFM** (daily 00:00) — hitung recency/frequency/monetary per customer per source
+- [ ] **K-Means clustering** (`php-ml`) — assign cluster ke setiap customer
+- [ ] **Badge segmen** di profil customer (website publik)
+- [ ] **Export CSV per segmen** dari RfmIndex
+
+---
+
+### ⏳ FASE 6 — POLISH (Belum Dimulai)
+
+- [ ] **Notifikasi WhatsApp** (Fonnte atau WA Cloud API) — konfirmasi booking, invoice lunas, dll
+- [ ] **Website Publik lengkap** — landing page, profil customer, motor saya, riwayat booking/order
+
+---
+
+### 🌐 WEBSITE PUBLIK — Scope Lengkap (Belum Ada)
+
+Semua halaman ini belum dibuat sama sekali. Guard `web`, Livewire + Tailwind.
+
+| Halaman | Route | Keterangan |
+|---|---|---|
+| Landing Page | `/` | Hero, layanan unggulan, produk featured, info bengkel |
+| Login/Register | `/login`, `/register` | Fortify — hanya buat akun `customer` |
+| Dashboard Customer | `/dashboard` | Booking aktif, order terbaru, badge segmen RFM |
+| Motor Saya | `/vehicles` | List + tambah kendaraan |
+| Detail Motor | `/vehicles/{id}` | Spek mesin (read-only) + history modifikasi timeline |
+| Booking Online | `/booking` | 3-step: kendaraan → tanggal → konfirmasi |
+| Riwayat Booking | `/bookings` | List booking milik customer, bisa cancel jika pending |
+| Toko Online | `/shop` | Katalog sparepart + bundle online |
+| Detail Produk | `/shop/{slug}` | Foto, deskripsi, harga, tambah ke keranjang |
+| Keranjang | `/cart` | Review item, pilih pengiriman, checkout |
+| Riwayat Order | `/orders` | List order + status pengiriman + no resi |
+| Profil | `/profile` | Edit data diri, ganti password, badge segmen RFM |
 
 ---
 
