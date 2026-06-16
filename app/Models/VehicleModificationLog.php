@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -15,7 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property array|null $specs_snapshot
  * @property array|null $parts_used
  * @property array|null $foto
- * @property \Illuminate\Support\Carbon $logged_at
+ * @property Carbon $logged_at
  */
 class VehicleModificationLog extends Model
 {

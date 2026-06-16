@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property int|null $mekanik_id
  * @property int|null $invoice_id
  * @property string $booking_number
- * @property \Illuminate\Support\Carbon $tanggal_booking
+ * @property Carbon $tanggal_booking
  * @property string|null $jam_mulai
  * @property string|null $jam_selesai
  * @property string $status
@@ -23,8 +23,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property string|null $catatan_admin
  * @property string $nama_pemesan
  * @property string $no_hp_pemesan
- * @property \Illuminate\Support\Carbon|null $confirmed_at
- * @property \Illuminate\Support\Carbon|null $cancelled_at
+ * @property Carbon|null $confirmed_at
+ * @property Carbon|null $cancelled_at
  * @property string|null $cancel_reason
  */
 class Booking extends Model

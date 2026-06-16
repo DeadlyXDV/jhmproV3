@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property int|null $mekanik_id
- * @property \Illuminate\Support\Carbon $tanggal
+ * @property Carbon $tanggal
  * @property int $kapasitas
  * @property int $terisi
  * @property bool $is_blocked

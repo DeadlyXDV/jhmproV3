@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -17,8 +18,8 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property string|null $snap_token
  * @property string|null $payment_url
  * @property array|null $raw_response
- * @property \Illuminate\Support\Carbon|null $paid_at
- * @property \Illuminate\Support\Carbon|null $expired_at
+ * @property Carbon|null $paid_at
+ * @property Carbon|null $expired_at
  */
 class Payment extends Model
 {

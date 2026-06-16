@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -15,8 +16,8 @@ use Illuminate\Support\Facades\DB;
  * @property string $status
  * @property string|null $keluhan_customer
  * @property string|null $catatan_mekanik
- * @property \Illuminate\Support\Carbon|null $mulai_at
- * @property \Illuminate\Support\Carbon|null $selesai_at
+ * @property Carbon|null $mulai_at
+ * @property Carbon|null $selesai_at
  */
 class WorkOrder extends Model
 {
