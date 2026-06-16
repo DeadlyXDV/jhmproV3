@@ -1,15 +1,91 @@
 <div>
+    {{-- Flash message --}}
+    @if(session('success'))
+    <div class="mb-4 px-4 py-3 bg-green-50 border border-green-200 text-green-700 text-sm rounded-lg flex items-center gap-2">
+        <x-heroicon-o-check-circle class="w-4 h-4 flex-shrink-0" />
+        {{ session('success') }}
+    </div>
+    @endif
+
     {{-- Page header --}}
     <div class="mb-6 flex items-center justify-between">
         <div>
             <h1 class="text-xl font-bold text-gray-900">Partner</h1>
             <p class="text-sm text-gray-500 mt-0.5">Daftar bengkel mitra</p>
         </div>
-        <button class="flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
+        @if(!$showForm)
+        <button wire:click="openCreate"
+                class="flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
             <x-heroicon-o-plus class="w-4 h-4" />
             Tambah Partner
         </button>
+        @endif
     </div>
+
+    {{-- Form tambah/edit --}}
+    @if($showForm)
+    <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+        <h2 class="text-sm font-semibold text-gray-700 mb-4 uppercase tracking-wide">
+            {{ $editingId ? 'Edit Partner' : 'Tambah Partner Baru' }}
+        </h2>
+        <form wire:submit="save" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Nama Bengkel <span class="text-red-500">*</span></label>
+                <input wire:model="namaBengkel" type="text"
+                       class="w-full border border-gray-300 text-sm px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                       placeholder="Bengkel ABC Motor" />
+                @error('namaBengkel') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Contact Person <span class="text-red-500">*</span></label>
+                <input wire:model="contactPerson" type="text"
+                       class="w-full border border-gray-300 text-sm px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                       placeholder="Nama PIC" />
+                @error('contactPerson') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">No. HP <span class="text-red-500">*</span></label>
+                <input wire:model="noHp" type="text"
+                       class="w-full border border-gray-300 text-sm px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                       placeholder="08123456789" />
+                @error('noHp') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Alamat</label>
+                <input wire:model="alamat" type="text"
+                       class="w-full border border-gray-300 text-sm px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                       placeholder="Opsional" />
+                @error('alamat') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            <div class="md:col-span-2">
+                <label class="block text-xs font-medium text-gray-600 mb-1">Catatan</label>
+                <textarea wire:model="catatan" rows="2"
+                          class="w-full border border-gray-300 text-sm px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                          placeholder="Catatan tambahan (opsional)"></textarea>
+                @error('catatan') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            <div class="md:col-span-2 flex items-center gap-3">
+                <button type="submit"
+                        class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-5 py-2 rounded-lg transition flex items-center gap-2">
+                    <div wire:loading wire:target="save" class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span wire:loading.remove wire:target="save">
+                        <x-heroicon-o-check class="w-4 h-4 inline -mt-0.5" /> Simpan
+                    </span>
+                    <span wire:loading wire:target="save">Menyimpan...</span>
+                </button>
+                <button type="button" wire:click="cancelForm"
+                        class="text-sm text-gray-500 hover:text-gray-700 px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition">
+                    Batal
+                </button>
+            </div>
+        </form>
+    </div>
+    @endif
 
     <div class="bg-white rounded-xl shadow-sm overflow-hidden">
 
@@ -56,7 +132,8 @@
                     <td class="px-5 py-4 text-gray-500 max-w-[160px] truncate">{{ $partner->catatan ?: '-' }}</td>
                     <td class="px-5 py-4">
                         <div class="flex items-center gap-2 justify-end">
-                            <button class="text-gray-400 hover:text-blue-600 transition">
+                            <button wire:click="openEdit({{ $partner->id }})"
+                                    class="text-gray-400 hover:text-blue-600 transition">
                                 <x-heroicon-o-pencil class="w-4 h-4" />
                             </button>
                         </div>

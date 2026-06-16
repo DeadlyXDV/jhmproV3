@@ -13,7 +13,159 @@
             <h1 class="text-xl font-bold text-gray-900">Sparepart</h1>
             <p class="text-sm text-gray-500 mt-0.5">Daftar semua part dan komponen inventori</p>
         </div>
+        @if(!$showForm)
+        <button wire:click="openCreate"
+                class="flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
+            <x-heroicon-o-plus class="w-4 h-4" />
+            Tambah Sparepart
+        </button>
+        @endif
     </div>
+
+    {{-- Form tambah/edit --}}
+    @if($showForm)
+    <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+        <h2 class="text-sm font-semibold text-gray-700 mb-4 uppercase tracking-wide">
+            {{ $editingId ? 'Edit Sparepart' : 'Tambah Sparepart Baru' }}
+        </h2>
+        <form wire:submit="save" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+            {{-- Baris 1: SKU, Nama, Kategori --}}
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">SKU <span class="text-red-500">*</span></label>
+                <input wire:model="sku" type="text"
+                       class="w-full border border-gray-300 text-sm px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 uppercase"
+                       placeholder="OLI-YAMALUBE-1L" />
+                @error('sku') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Nama Part <span class="text-red-500">*</span></label>
+                <input wire:model="itemName" type="text"
+                       class="w-full border border-gray-300 text-sm px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                       placeholder="Oli Yamalube 1 Liter" />
+                @error('itemName') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Kategori</label>
+                <select wire:model="categoryId"
+                        class="w-full border border-gray-300 text-sm px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-white">
+                    <option value="">— Tanpa Kategori —</option>
+                    @foreach($categories as $cat)
+                    <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                    @endforeach
+                </select>
+                @error('categoryId') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            {{-- Baris 2: Merek, Satuan, Berat --}}
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Merek</label>
+                <input wire:model="brand" type="text"
+                       class="w-full border border-gray-300 text-sm px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                       placeholder="Yamalube, NGK, dll" />
+                @error('brand') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Satuan <span class="text-red-500">*</span></label>
+                <input wire:model="satuan" type="text"
+                       class="w-full border border-gray-300 text-sm px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                       placeholder="pcs, liter, set" />
+                @error('satuan') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Berat (gram)</label>
+                <input wire:model="berat" type="number" min="1"
+                       class="w-full border border-gray-300 text-sm px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                       placeholder="500" />
+                @error('berat') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            {{-- Baris 3: Harga Beli, Harga Jual, Harga Online --}}
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Harga Beli (Rp) <span class="text-red-500">*</span></label>
+                <input wire:model="hargaBeli" type="number" min="0" step="500"
+                       class="w-full border border-gray-300 text-sm px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                       placeholder="25000" />
+                @error('hargaBeli') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Harga Jual (Rp) <span class="text-red-500">*</span></label>
+                <input wire:model="hargaJual" type="number" min="0" step="500"
+                       class="w-full border border-gray-300 text-sm px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                       placeholder="35000" />
+                @error('hargaJual') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Harga Online (Rp)</label>
+                <input wire:model="hargaOnline" type="number" min="0" step="500"
+                       class="w-full border border-gray-300 text-sm px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                       placeholder="Opsional" />
+                @error('hargaOnline') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            {{-- Baris 4: Stok, Min Stok --}}
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Stok Awal <span class="text-red-500">*</span></label>
+                <input wire:model="stock" type="number" min="0"
+                       class="w-full border border-gray-300 text-sm px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                       placeholder="10" />
+                @error('stock') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Minimum Stok <span class="text-red-500">*</span></label>
+                <input wire:model="minimumStock" type="number" min="0"
+                       class="w-full border border-gray-300 text-sm px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                       placeholder="2" />
+                @error('minimumStock') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            {{-- Baris 5: Deskripsi --}}
+            <div class="md:col-span-3">
+                <label class="block text-xs font-medium text-gray-600 mb-1">Deskripsi</label>
+                <textarea wire:model="deskripsi" rows="2"
+                          class="w-full border border-gray-300 text-sm px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                          placeholder="Deskripsi produk (opsional)"></textarea>
+                @error('deskripsi') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            {{-- Toggle --}}
+            <div class="md:col-span-3 flex items-center gap-6">
+                <label class="flex items-center gap-2 cursor-pointer select-none">
+                    <input wire:model="isActive" type="checkbox"
+                           class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500" />
+                    <span class="text-sm text-gray-700">Aktif</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer select-none">
+                    <input wire:model="isSoldOnline" type="checkbox"
+                           class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500" />
+                    <span class="text-sm text-gray-700">Dijual Online</span>
+                </label>
+            </div>
+
+            <div class="md:col-span-3 flex items-center gap-3">
+                <button type="submit"
+                        class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-5 py-2 rounded-lg transition flex items-center gap-2">
+                    <div wire:loading wire:target="save" class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span wire:loading.remove wire:target="save">
+                        <x-heroicon-o-check class="w-4 h-4 inline -mt-0.5" /> Simpan
+                    </span>
+                    <span wire:loading wire:target="save">Menyimpan...</span>
+                </button>
+                <button type="button" wire:click="cancelForm"
+                        class="text-sm text-gray-500 hover:text-gray-700 px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition">
+                    Batal
+                </button>
+            </div>
+        </form>
+    </div>
+    @endif
 
     {{-- Card tabel --}}
     <div class="bg-white rounded-xl shadow-sm overflow-hidden">
@@ -55,6 +207,7 @@
                     <th class="text-center px-5 py-3">Min</th>
                     <th class="text-right px-5 py-3">Harga Jual</th>
                     <th class="text-center px-5 py-3">Aktif</th>
+                    <th class="px-5 py-3"></th>
                 </tr>
             </thead>
             <tbody>
@@ -88,10 +241,16 @@
                             <span class="w-3.5 h-3.5 bg-white rounded-full shadow transform transition {{ $part->is_active ? 'translate-x-2' : '-translate-x-2' }}"></span>
                         </button>
                     </td>
+                    <td class="px-5 py-4">
+                        <button wire:click="openEdit({{ $part->id }})"
+                                class="text-gray-400 hover:text-blue-600 transition">
+                            <x-heroicon-o-pencil class="w-4 h-4" />
+                        </button>
+                    </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="8" class="px-5 py-12 text-center text-sm text-gray-400">
+                    <td colspan="9" class="px-5 py-12 text-center text-sm text-gray-400">
                         Tidak ada sparepart ditemukan
                     </td>
                 </tr>

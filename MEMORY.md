@@ -19,16 +19,15 @@
 
 ## CURRENT SESSION
 
-- **Sedang dikerjakan:** Fase 5 — RFM & Analitik (SELESAI).
+- **Sedang dikerjakan:** CRUD gap fix — Partners + Spareparts (SELESAI).
 - **File yang terakhir dimodifikasi:**
-  - `app/Console/Commands/CalculateRfm.php` — Artisan command `rfm:calculate` — K-Means inline (tanpa library), quintile scoring, UPSERT customer_rfm + append rfm_history
-  - `app/Models/RfmHistory.php` — tambah `created_at` ke `$fillable`
-  - `app/Livewire/Admin/Rfm/RfmIndex.php` — tambah `exportCsv()` — download CSV per source/segmen
-  - `app/Livewire/Admin/Settings/SettingIndex.php` — tambah `rfmKClusters`, `rfmWeightR/F/M`, `rfmPeriodMonths` + method `saveRfmConfig()`
-  - `database/seeders/ClusterDefinitionSeeder.php` — seed 5 cluster default (Champion, Loyal, Potential, At Risk, Lost)
-  - `routes/console.php` — tambah schedule `rfm:calculate` daily at 00:00
-  - `tests/Feature/CalculateRfmCommandTest.php` — 9 tests untuk command
-- **Berhenti di:** **Fase 5 selesai 100%**. Tests: **124/124 pass (123 passed, 1 skip), 0 fail**. Fase 4 di-skip. Siap lanjut Fase 6.
+  - `app/Livewire/Admin/Partners/PartnerIndex.php` — tambah openCreate/openEdit/save/cancelForm dengan form inline
+  - `app/Livewire/Admin/Spareparts/SparepartIndex.php` — tambah openCreate/openEdit/save/cancelForm; SKU auto-uppercase; unique validation ignore self saat edit
+  - `resources/views/livewire/admin/partners/index.blade.php` — tambah form panel + wire:click di tombol pencil
+  - `resources/views/livewire/admin/spareparts/index.blade.php` — tambah tombol Tambah + form panel + kolom edit
+  - `tests/Feature/AdminPartnerIndexTest.php` — 6 tests baru (create, validasi, edit, cancel, search)
+  - `tests/Feature/AdminSparepartIndexTest.php` — 9 tests baru (create, uppercase SKU, validasi, unique SKU, edit, toggleActive, cancel, filter)
+- **Berhenti di:** CRUD Partners + Spareparts selesai. Tests: **142/142 pass (141 passed, 1 skip), 0 fail**.
 - **AI sebelumnya:** Claude
 
 ---
@@ -411,6 +410,8 @@ Semua halaman ini belum dibuat sama sekali. Guard `web`, Livewire + Tailwind.
 | Status | Komponen | Deskripsi | Ditemukan di commit |
 |---|---|---|---|
 | 🔍 Perlu verifikasi | UserIndex | Toggle active hanya diproteksi di server-side; pastikan UI tidak render tombol untuk non-super_admin | `77c3f8f` |
+| ✅ Fixed | PartnerIndex | Tambah Create/Edit inline form — openCreate/openEdit/save/cancelForm | 2026-06-17 |
+| ✅ Fixed | SparepartIndex | Tambah Create/Edit inline form — semua field kecuali images/dimensi; SKU auto-uppercase | 2026-06-17 |
 | ✅ Fixed | CustomerRfm | Tabel DB bernama `customer_rfm` (singular) — sudah ditambahkan `$table = 'customer_rfm'` di model | session 2026-06-15 |
 | ✅ Fixed | RfmHistory | Tabel DB bernama `rfm_history` (singular) — sudah ditambahkan `$table = 'rfm_history'` di model | session 2026-06-15 |
 | ✅ Fixed | PosPage | XSS: `addslashes()` diganti `Js::from()` di 3 titik `wire:click` pada blade POS | `d856758` |
