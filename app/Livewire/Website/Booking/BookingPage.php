@@ -12,6 +12,7 @@ use App\Models\Vehicle;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -180,7 +181,12 @@ class BookingPage extends Component
 
     public function selectVehicle(int $id): void
     {
-        $this->vehicleId = $id;
+        // Ensure the vehicle belongs to this customer before accepting it
+        $vehicle = Vehicle::where('id', $id)
+            ->where('customer_id', $this->customer->id)
+            ->firstOrFail();
+
+        $this->vehicleId = $vehicle->id;
     }
 
     public function saveVehicle(): void
@@ -246,7 +252,12 @@ class BookingPage extends Component
     public function nextStep(): void
     {
         if ($this->step === 1) {
-            $this->validate(['vehicleId' => 'required|integer']);
+            $this->validate([
+                'vehicleId' => [
+                    'required', 'integer',
+                    Rule::exists('vehicles', 'id')->where('customer_id', $this->customer->id),
+                ],
+            ]);
         } elseif ($this->step === 2) {
             $this->validate([
                 'selectedServices' => 'required|array|min:1',
@@ -270,7 +281,10 @@ class BookingPage extends Component
     public function submit(): void
     {
         $this->validate([
-            'vehicleId' => 'required|integer|exists:vehicles,id',
+            'vehicleId' => [
+                'required', 'integer',
+                Rule::exists('vehicles', 'id')->where('customer_id', $this->customer->id),
+            ],
             'selectedServices' => 'required|array|min:1',
             'tanggalBooking' => 'required|date|after:today',
             'keluhan' => 'nullable|string|max:2000',
