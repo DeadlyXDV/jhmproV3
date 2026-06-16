@@ -81,6 +81,17 @@ class InvoiceCreate extends Component
 
     public string $jumlahBayar = '0';
 
+    // ==================== MOUNT ====================
+
+    public function mount(): void
+    {
+        $fromBookingId = request()->query('from_booking');
+        if ($fromBookingId) {
+            $this->tipe = 'booking';
+            $this->selectBooking((int) $fromBookingId);
+        }
+    }
+
     // ==================== TIPE ====================
 
     public function updatedTipe(): void

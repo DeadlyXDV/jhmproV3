@@ -60,6 +60,15 @@ class BookingIndex extends Component
         session()->flash('success', "Booking #{$booking->booking_number} dibatalkan.");
     }
 
+    public function createInvoice(int $id): void
+    {
+        $booking = Booking::findOrFail($id);
+
+        abort_unless($booking->status === 'confirmed', 422);
+
+        $this->redirect(route('admin.invoices.create', ['from_booking' => $id]));
+    }
+
     public function render(): View
     {
         $bookings = Booking::query()

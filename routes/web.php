@@ -29,6 +29,7 @@ use App\Livewire\Admin\WorkOrders\WorkOrderIndex;
 use App\Livewire\Mekanik\Dashboard\MekanikDashboard;
 use App\Livewire\Mekanik\WorkOrders\MekanikWorkOrderDetail;
 use App\Livewire\Mekanik\WorkOrders\MekanikWorkOrderIndex;
+use App\Livewire\Website\Booking\BookingPage;
 use Illuminate\Support\Facades\Route;
 
 // ── WEBSITE PUBLIK ───────────────────────────────────────────────────────────
@@ -36,6 +37,10 @@ Route::view('/', 'welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('dashboard', 'dashboard')->name('dashboard');
+
+    // Booking online (customer)
+    Route::get('/booking', BookingPage::class)->name('booking');
+    Route::get('/booking/success', fn () => view('website.booking.success'))->name('booking.success');
 });
 
 require __DIR__.'/settings.php';

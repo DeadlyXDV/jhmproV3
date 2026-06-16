@@ -5,6 +5,7 @@ namespace App\Models;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
@@ -90,5 +91,11 @@ class User extends Authenticatable
     public function workOrders(): HasMany
     {
         return $this->hasMany(WorkOrder::class, 'mekanik_id');
+    }
+
+    /** @return HasOne<Customer, $this> */
+    public function customer(): HasOne
+    {
+        return $this->hasOne(Customer::class);
     }
 }

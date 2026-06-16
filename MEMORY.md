@@ -19,15 +19,28 @@
 
 ## CURRENT SESSION
 
-- **Sedang dikerjakan:** Fase 2 — Operasional Bengkel.
+- **Sedang dikerjakan:** Fase 3 — Booking Online.
 - **File yang terakhir dimodifikasi:**
-  - `app/Observers/InvoiceItemObserver.php` — baru, auto-buat StockMovement saat InvoiceItem dengan sparepart_id dibuat
-  - `app/Providers/AppServiceProvider.php` — daftarkan InvoiceItemObserver
-  - `app/Livewire/Admin/Invoices/InvoiceCreate.php` — hapus manual StockMovement (kini via Observer)
-  - `app/Livewire/Admin/Pos/PosPage.php` — hapus manual StockMovement (kini via Observer)
-  - `app/Livewire/Admin/Reports/ReportIndex.php` — tambah `exportCsv()` — download CSV laporan keuangan berdasarkan filter aktif
-  - `tests/Feature/AdminReportIndexTest.php` — tambah 2 test baru (export CSV + auth guard)
-- **Berhenti di:** **Fase 2 selesai 100%**. Tests: **95/95 pass, 1 skip, 0 fail**. Siap lanjut Fase 3.
+  - `app/Console/Commands/GenerateBookingSlots.php` — Artisan command `booking:generate-slots` — generate slot berdasarkan setting kapasitas + hari operasional
+  - `app/Livewire/Website/Booking/BookingPage.php` — halaman booking 3-step (kendaraan → tanggal → konfirmasi) dengan race condition protection via lockForUpdate
+  - `app/Livewire/Admin/Bookings/BookingIndex.php` — tambah `createInvoice(int $id)` — redirect ke InvoiceCreate dengan from_booking param
+  - `app/Livewire/Admin/Invoices/InvoiceCreate.php` — tambah `mount()` — auto-load booking jika ada query param `from_booking`
+  - `app/Models/Customer.php` — tambah `user_id` fillable + `user()` belongsTo relation
+  - `app/Models/User.php` — tambah `customer()` hasOne relation
+  - `app/Models/Booking.php` — tambah `HasFactory` trait
+  - `app/Models/BookingSlot.php` — hapus cast `tanggal` => `date` (biar string agar where('tanggal', 'Y-m-d') bekerja di SQLite)
+  - `database/factories/BookingFactory.php` — factory baru dengan states `confirmed()` + `cancelled()`
+  - `database/migrations/2026_06_17_000001_add_user_id_to_customers_table.php` — alter migration production
+  - `database/migrations/2026_06_15_222816_create_core_tables.php` — tambah `user_id` ke `customers` table (untuk SQLite test)
+  - `resources/views/livewire/website/booking/booking-page.blade.php` — Blade view 3-step booking form
+  - `resources/views/website/booking/success.blade.php` — halaman sukses booking
+  - `resources/views/layouts/app/sidebar.blade.php` — tambah link "Booking Servis" di sidebar customer
+  - `routes/web.php` — tambah route `/booking` + `/booking/success`
+  - `routes/console.php` — daftarkan schedule `booking:generate-slots` daily
+  - `tests/Feature/GenerateBookingSlotsCommandTest.php` — 4 tests untuk command
+  - `tests/Feature/WebsiteBookingPageTest.php` — 9 tests untuk BookingPage
+  - `tests/Feature/AdminBookingIndexTest.php` — 7 tests untuk BookingIndex admin
+- **Berhenti di:** **Fase 3 selesai 100%**. Tests: **115/115 pass, 1 skip, 0 fail**. Siap lanjut Fase 4.
 - **AI sebelumnya:** Claude
 
 ---
@@ -100,7 +113,7 @@ routes/web.php                             ← semua route (web + admin + mekani
 
 ## 6. Status Development
 
-**Fase saat ini:** Fase 2 SELESAI 100% · Fase 3–6 belum dimulai | **Terakhir diperbarui:** 2026-06-17
+**Fase saat ini:** Fase 3 SELESAI 100% · Fase 4–6 belum dimulai | **Terakhir diperbarui:** 2026-06-17
 
 > **Sumber kebenaran rencana lengkap:** `/home/voldemort/Downloads/plan.md` (4092 baris). Path ini hanya bisa diakses di mesin developer — tidak bisa diakses AI lain.
 
@@ -179,13 +192,14 @@ Order, OrderItem, Payment, Shipment, ClusterDefinition, CustomerRfm, RfmHistory,
 
 ---
 
-### ⏳ FASE 3 — BOOKING ONLINE (Belum Dimulai)
+### ✅ FASE 3 — BOOKING ONLINE (Selesai)
 
-Semua di bawah adalah **Website Publik** (guard `web`, customer-facing):
-
-- [ ] **Booking slot generator** — Artisan Command untuk generate `booking_slots` harian berdasarkan kapasitas + hari operasional dari `settings`
-- [ ] **Halaman booking publik** `/booking` — 3 step: pilih kendaraan → pilih tanggal/slot → konfirmasi
-- [ ] **Integrasi booking → invoice + WO** — saat admin konfirmasi booking, bisa langsung buat invoice dan WO
+- [x] **Booking slot generator** — `booking:generate-slots` Artisan command; jadwal harian via `routes/console.php`; setting via `Setting::get('booking_kapasitas', 'booking_advance_days', 'booking_hari')`
+- [x] **Halaman booking publik** `/booking` — 3 step: pilih kendaraan (inline add) → pilih tanggal dari kalender slot → konfirmasi + submit dengan `lockForUpdate` race condition protection
+- [x] **Integrasi booking → invoice** — `BookingIndex.createInvoice(int $id)` redirect ke InvoiceCreate; `InvoiceCreate.mount()` auto-load booking via `from_booking` query param
+- [x] **Customer auto-create** — `BookingPage.mount()` auto-buat record Customer jika user customer belum punya record
+- [x] **Sidebar customer** — link "Booking Servis" sudah ditambahkan
+- [x] **Tests:** 20 test baru (7 AdminBookingIndex + 9 WebsiteBookingPage + 4 GenerateBookingSlots command)
 
 ---
 
@@ -254,6 +268,7 @@ Semua halaman ini belum dibuat sama sekali. Guard `web`, Livewire + Tailwind.
 | `Setting` model key-value (tabel `settings`) | Tidak ada tabel settings di DB awal; dibuat migration baru dengan PK `key` (string) untuk menyimpan config bengkel, booking, dll |
 | `PosPage` pakai `layouts/pos.blade.php` | POS fullscreen tanpa sidebar/topbar admin — layout terpisah sesuai plan |
 | `ReportIndex` trend: kondisional semua driver | `strftime` (SQLite) / `DATE_FORMAT` (MySQL) / `TO_CHAR` (PostgreSQL) — auto-detect via `DB::getDriverName()` |
+| `BookingSlot.tanggal` **tidak di-cast** ke `date` | Jika di-cast, SQLite menyimpan sebagai `Y-m-d H:i:s` sehingga `where('tanggal', 'Y-m-d')` gagal. Kolom dibiarkan sebagai string agar query `->where('tanggal', $date->toDateString())` bekerja di semua driver |
 
 ---
 
@@ -347,7 +362,7 @@ Semua halaman ini belum dibuat sama sekali. Guard `web`, Livewire + Tailwind.
 - **View:** `resources/views/livewire/admin/bookings/index.blade.php`
 - **Status:** ✅ Implemented
 - **Public properties:** `$search` (string), `$filterStatus` (string), `$filterSource` (string)
-- **Wire actions:** `confirm(int $id)`, `cancel(int $id)`, `updatedSearch()`, `updatedFilterStatus()`, `updatedFilterSource()`
+- **Wire actions:** `confirm(int $id)`, `cancel(int $id)`, `createInvoice(int $id)`, `updatedSearch()`, `updatedFilterStatus()`, `updatedFilterSource()`
 
 ### BookingCalendar
 

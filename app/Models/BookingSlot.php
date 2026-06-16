@@ -4,12 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property int|null $mekanik_id
- * @property Carbon $tanggal
+ * @property string $tanggal
  * @property int $kapasitas
  * @property int $terisi
  * @property bool $is_blocked
@@ -24,7 +23,6 @@ class BookingSlot extends Model
     protected function casts(): array
     {
         return [
-            'tanggal' => 'date',
             'is_blocked' => 'boolean',
         ];
     }

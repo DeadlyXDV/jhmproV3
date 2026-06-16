@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -29,6 +30,8 @@ use Illuminate\Support\Carbon;
  */
 class Booking extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'customer_id', 'vehicle_id', 'mekanik_id', 'invoice_id',
         'booking_number', 'tanggal_booking', 'jam_mulai', 'jam_selesai',

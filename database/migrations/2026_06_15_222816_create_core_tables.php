@@ -10,6 +10,7 @@ return new class extends Migration
     {
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id')->nullable()->unique();
             $table->string('nama');
             $table->string('no_hp');
             $table->string('email')->nullable();

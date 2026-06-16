@@ -4,11 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @property int $id
+ * @property int|null $user_id
  * @property string $nama
  * @property string $no_hp
  * @property string|null $email
@@ -20,12 +22,19 @@ class Customer extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'nama',
         'no_hp',
         'email',
         'alamat',
         'catatan',
     ];
+
+    /** @return BelongsTo<User, $this> */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 
     /** @return HasMany<Vehicle, $this> */
     public function vehicles(): HasMany
