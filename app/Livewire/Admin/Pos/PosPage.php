@@ -7,7 +7,6 @@ use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\Service;
 use App\Models\Sparepart;
-use App\Models\StockMovement;
 use App\Models\WorkOrder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -338,21 +337,7 @@ class PosPage extends Component
                     'subtotal' => $item['harga'] * $item['qty'],
                 ]);
 
-                if ($item['tipe'] === 'sparepart' && $item['model']) {
-                    $sparepart = $item['model'];
-                    $stockBefore = $sparepart->stock;
-                    $sparepart->decrement('stock', $item['qty']);
-                    StockMovement::create([
-                        'sparepart_id' => $sparepart->id,
-                        'user_id' => auth('admin')->id(),
-                        'type' => 'out',
-                        'qty' => $item['qty'],
-                        'stock_before' => $stockBefore,
-                        'stock_after' => $stockBefore - $item['qty'],
-                        'reference_type' => Invoice::class,
-                        'reference_id' => $invoice->id,
-                    ]);
-                }
+                // Pengurangan stok & StockMovement dibuat otomatis oleh InvoiceItemObserver
             }
 
             if ($this->walkInTipe === 'servis' && $this->mode === 'walk_in') {

@@ -1,7 +1,9 @@
 <?php
 
+use App\Livewire\Admin\Reports\ReportIndex;
 use App\Models\Invoice;
 use App\Models\User;
+use Livewire\Livewire;
 
 test('guest diblokir dari halaman laporan', function () {
     $this->get(route('admin.reports.index'))
@@ -57,4 +59,29 @@ test('laporan menghitung total pendapatan dari invoice bulan ini', function () {
         ->get(route('admin.reports.index'))
         ->assertOk()
         ->assertSee('300.000');
+});
+
+test('super_admin bisa export CSV laporan keuangan', function () {
+    $superAdmin = User::factory()->superAdmin()->create();
+    Invoice::factory()->create([
+        'user_id' => $superAdmin->id,
+        'tanggal' => now(),
+        'grand_total' => 500000,
+        'payment_status' => 'paid',
+        'invoice_number' => 'INV-TEST01',
+    ]);
+
+    Livewire::actingAs($superAdmin, 'admin')
+        ->test(ReportIndex::class)
+        ->call('exportCsv')
+        ->assertFileDownloaded();
+});
+
+test('admin biasa tidak bisa export CSV laporan', function () {
+    $admin = User::factory()->admin()->create();
+
+    Livewire::actingAs($admin, 'admin')
+        ->test(ReportIndex::class)
+        ->call('exportCsv')
+        ->assertForbidden();
 });

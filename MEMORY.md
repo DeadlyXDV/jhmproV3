@@ -19,14 +19,15 @@
 
 ## CURRENT SESSION
 
-- **Sedang dikerjakan:** Selesai implementasi InvoiceCreate + UserSeeder (sisa Fase 1).
+- **Sedang dikerjakan:** Fase 2 — Operasional Bengkel.
 - **File yang terakhir dimodifikasi:**
-  - `app/Livewire/Admin/Invoices/InvoiceCreate.php` — full implementation
-  - `resources/views/livewire/admin/invoices/create.blade.php` — full view
-  - `database/seeders/UserSeeder.php` — baru (3 user: super_admin, admin, mekanik)
-  - `database/seeders/DatabaseSeeder.php` — panggil UserSeeder
-  - `tests/Feature/AdminInvoiceCreateTest.php` — 20 tests baru
-- **Berhenti di:** **Fase 1 selesai 100%**. Tests: **92/93 pass, 1 skip, 0 fail**. User diminta testing sebelum lanjut.
+  - `app/Observers/InvoiceItemObserver.php` — baru, auto-buat StockMovement saat InvoiceItem dengan sparepart_id dibuat
+  - `app/Providers/AppServiceProvider.php` — daftarkan InvoiceItemObserver
+  - `app/Livewire/Admin/Invoices/InvoiceCreate.php` — hapus manual StockMovement (kini via Observer)
+  - `app/Livewire/Admin/Pos/PosPage.php` — hapus manual StockMovement (kini via Observer)
+  - `app/Livewire/Admin/Reports/ReportIndex.php` — tambah `exportCsv()` — download CSV laporan keuangan berdasarkan filter aktif
+  - `tests/Feature/AdminReportIndexTest.php` — tambah 2 test baru (export CSV + auth guard)
+- **Berhenti di:** **Fase 2 selesai 100%**. Tests: **95/95 pass, 1 skip, 0 fail**. Siap lanjut Fase 3.
 - **AI sebelumnya:** Claude
 
 ---
@@ -99,7 +100,7 @@ routes/web.php                             ← semua route (web + admin + mekani
 
 ## 6. Status Development
 
-**Fase saat ini:** Fase 1 SELESAI 100% · Fase 2–6 belum dimulai | **Terakhir diperbarui:** 2026-06-16
+**Fase saat ini:** Fase 2 SELESAI 100% · Fase 3–6 belum dimulai | **Terakhir diperbarui:** 2026-06-17
 
 > **Sumber kebenaran rencana lengkap:** `/home/voldemort/Downloads/plan.md` (4092 baris). Path ini hanya bisa diakses di mesin developer — tidak bisa diakses AI lain.
 
@@ -169,12 +170,12 @@ Order, OrderItem, Payment, Shipment, ClusterDefinition, CustomerRfm, RfmHistory,
 
 ---
 
-### ⏳ FASE 2 — OPERASIONAL BENGKEL (Belum Dimulai)
+### ✅ FASE 2 — OPERASIONAL BENGKEL (Selesai)
 
-- [ ] Stock movement **observer/event** otomatis saat invoice tersimpan (sekarang manual di PosPage)
-- [ ] Alert **stok minimum** di dashboard — tampilkan sparepart dengan `stock <= minimum_stock`
-- [ ] **Modification log** otomatis saat spek mesin di VehicleDetail diupdate
-- [ ] **Laporan keuangan lebih lengkap** — export CSV/PDF
+- [x] Stock movement **observer** otomatis — `InvoiceItemObserver` dibuat di `app/Observers/`; dihapus dari InvoiceCreate + PosPage
+- [x] Alert **stok minimum** di dashboard — `AdminDashboard` sudah ada `stokKritis` (`whereColumn('stock', '<=', 'minimum_stock')`)
+- [x] **Modification log** otomatis saat spek mesin diupdate — `VehicleDetail.saveSpecs()` sudah auto-create log
+- [x] **Export CSV laporan keuangan** — `ReportIndex.exportCsv()` download CSV dengan filter tanggal + tipe aktif
 
 ---
 

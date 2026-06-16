@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\InvoiceItem;
 use App\Models\Vehicle;
+use App\Observers\InvoiceItemObserver;
 use App\Observers\VehicleObserver;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
@@ -28,6 +30,7 @@ class AppServiceProvider extends ServiceProvider
         $this->configureDefaults();
 
         Vehicle::observe(VehicleObserver::class);
+        InvoiceItem::observe(InvoiceItemObserver::class);
     }
 
     /**

@@ -9,6 +9,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Livewire\Component;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ReportIndex extends Component
 {
@@ -22,6 +23,47 @@ class ReportIndex extends Component
     {
         $this->dateFrom = now()->startOfMonth()->format('Y-m-d');
         $this->dateTo = now()->format('Y-m-d');
+    }
+
+    public function exportCsv(): StreamedResponse
+    {
+        abort_unless(auth('admin')->user()?->isSuperAdmin(), 403);
+
+        $from = Carbon::parse($this->dateFrom)->startOfDay();
+        $to = Carbon::parse($this->dateTo)->endOfDay();
+
+        $invoices = Invoice::query()
+            ->with(['customer', 'partner', 'user'])
+            ->whereBetween('tanggal', [$from, $to])
+            ->when($this->filterTipe === 'bengkel', fn ($q) => $q->whereIn('tipe', ['jasa', 'sparepart', 'bundle', 'campuran', 'walk_in']))
+            ->orderBy('tanggal')
+            ->get();
+
+        $filename = 'laporan-keuangan-'.$this->dateFrom.'-sd-'.$this->dateTo.'.csv';
+
+        return response()->streamDownload(function () use ($invoices) {
+            $handle = fopen('php://output', 'w');
+
+            fwrite($handle, "\xEF\xBB\xBF"); // BOM UTF-8 agar Excel bisa buka tanpa encoding masalah
+
+            fputcsv($handle, ['No Invoice', 'Tanggal', 'Customer / Partner', 'Tipe', 'Grand Total', 'Status Pembayaran', 'Admin']);
+
+            foreach ($invoices as $invoice) {
+                $pihak = $invoice->customer?->nama ?? $invoice->partner?->nama_bengkel ?? '-';
+
+                fputcsv($handle, [
+                    $invoice->invoice_number,
+                    Carbon::parse($invoice->tanggal)->format('Y-m-d'),
+                    $pihak,
+                    $invoice->tipe,
+                    $invoice->grand_total,
+                    $invoice->payment_status,
+                    $invoice->user?->name ?? '-',
+                ]);
+            }
+
+            fclose($handle);
+        }, $filename, ['Content-Type' => 'text/csv; charset=UTF-8']);
     }
 
     public function render(): View

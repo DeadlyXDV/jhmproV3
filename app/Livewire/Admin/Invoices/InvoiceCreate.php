@@ -9,7 +9,6 @@ use App\Models\InvoiceItem;
 use App\Models\Partner;
 use App\Models\Service;
 use App\Models\Sparepart;
-use App\Models\StockMovement;
 use App\Models\Vehicle;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -435,23 +434,10 @@ class InvoiceCreate extends Component
                 $hargaBeli = 0;
 
                 if ($itemType === 'sparepart') {
-                    $sparepart = Sparepart::findOrFail($item['id']);
-                    $hargaBeli = (float) $sparepart->harga_beli;
-                    $stockBefore = $sparepart->stock;
-                    $sparepart->decrement('stock', $qty);
-
-                    StockMovement::create([
-                        'sparepart_id' => $sparepart->id,
-                        'user_id' => auth('admin')->id(),
-                        'type' => 'out',
-                        'qty' => $qty,
-                        'stock_before' => $stockBefore,
-                        'stock_after' => $stockBefore - $qty,
-                        'reference_type' => Invoice::class,
-                        'reference_id' => $invoice->id,
-                    ]);
+                    $hargaBeli = (float) Sparepart::findOrFail($item['id'])->harga_beli;
                 }
 
+                // Pengurangan stok & StockMovement dibuat otomatis oleh InvoiceItemObserver
                 InvoiceItem::create([
                     'invoice_id' => $invoice->id,
                     'service_id' => $itemType === 'service' ? $item['id'] : null,
