@@ -19,15 +19,16 @@
 
 ## CURRENT SESSION
 
-- **Sedang dikerjakan:** CRUD gap fix — Partners + Spareparts (SELESAI).
-- **File yang terakhir dimodifikasi:**
-  - `app/Livewire/Admin/Partners/PartnerIndex.php` — tambah openCreate/openEdit/save/cancelForm dengan form inline
-  - `app/Livewire/Admin/Spareparts/SparepartIndex.php` — tambah openCreate/openEdit/save/cancelForm; SKU auto-uppercase; unique validation ignore self saat edit
-  - `resources/views/livewire/admin/partners/index.blade.php` — tambah form panel + wire:click di tombol pencil
-  - `resources/views/livewire/admin/spareparts/index.blade.php` — tambah tombol Tambah + form panel + kolom edit
-  - `tests/Feature/AdminPartnerIndexTest.php` — 6 tests baru (create, validasi, edit, cancel, search)
-  - `tests/Feature/AdminSparepartIndexTest.php` — 9 tests baru (create, uppercase SKU, validasi, unique SKU, edit, toggleActive, cancel, filter)
-- **Berhenti di:** CRUD Partners + Spareparts selesai. Tests: **142/142 pass (141 passed, 1 skip), 0 fail**.
+- **Sedang dikerjakan:** Seeder untuk semua menu — **SELESAI** (commit `6024b88`)
+- **File yang dimodifikasi:**
+  - `app/Models/Vehicle.php` — tambah `HasFactory`
+  - `database/factories/VehicleFactory.php` — factory baru motor Indonesia
+  - 11 seeders baru: Customer, Vehicle, Partner, SparepartCategory, Sparepart, Service, ProductBundle, Booking, Invoice, StockMovement, Order
+  - `database/seeders/DatabaseSeeder.php` — daftar semua seeder dengan urutan yang benar
+  - 4 alter migrations: tambah `Schema::hasTable()/hasColumn()` guard agar `migrate:fresh` tidak fail
+- **Cara pakai:** `php artisan migrate:fresh --seed`
+- **Hasil seed:** 3 users · 15 customers · 21 vehicles · 5 partners · 22 categories · 26 spareparts · 15 services · 5 bundles · 10 bookings · 12 invoices · 11 work orders · 31 stock movements · 8 orders
+- **Tests:** 141 pass, 1 skip, 0 fail
 - **AI sebelumnya:** Claude
 
 ---
