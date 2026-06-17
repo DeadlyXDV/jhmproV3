@@ -9,7 +9,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (DB::connection()->getDriverName() === 'sqlite') {
+        if (DB::connection()->getDriverName() === 'sqlite' || Schema::hasColumn('customers', 'user_id')) {
             return;
         }
 
