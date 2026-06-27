@@ -19,11 +19,11 @@
 
 ## CURRENT SESSION
 
-- **Sedang dikerjakan:** Fix seeder idempotent — **SELESAI**
+- **Sedang dikerjakan:** Fix RFM cluster_label "Unknown" — **SELESAI**
 - **File yang dimodifikasi:**
-  - `database/seeders/DatabaseSeeder.php` — tambah truncate semua tabel (disable FK checks) sebelum seeding; sekarang `db:seed` bisa dijalankan berulang kali tanpa error
-- **Cara pakai:** `php artisan db:seed` (idempotent, truncate otomatis) ATAU `php artisan migrate:fresh --seed`
-- **Hasil seed:** 3 users · 15 customers · 21 vehicles · 5 partners · 22 categories · 26 spareparts · 15 services · 5 bundles · 10 bookings · 12 invoices · 11 work orders · 31 stock movements · 8 orders
+  - `database/seeders/DatabaseSeeder.php` — tambah `ClusterDefinitionSeeder` (terlewat sebelumnya); truncate `cluster_definitions` juga
+- **Cara pakai:** `php artisan db:seed && php artisan rfm:calculate`
+- **Hasil seed:** 3 users · 15 customers · 21 vehicles · 5 partners · 5 cluster definitions · 22 categories · 26 spareparts · 15 services · 5 bundles · 10 bookings · 12 invoices · 11 work orders · 31 stock movements · 8 orders
 - **Tests:** 141 pass, 1 skip, 0 fail
 - **AI sebelumnya:** Claude
 

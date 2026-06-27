@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             'partners',
             'vehicles', 'customers',
             'users',
+            'cluster_definitions',
         ] as $table) {
             DB::table($table)->truncate();
         }
@@ -32,6 +33,7 @@ class DatabaseSeeder extends Seeder
         DB::statement('SET FOREIGN_KEY_CHECKS=1');
 
         $this->call([
+            ClusterDefinitionSeeder::class,
             UserSeeder::class,
             CustomerSeeder::class,
             VehicleSeeder::class,
