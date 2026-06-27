@@ -19,14 +19,10 @@
 
 ## CURRENT SESSION
 
-- **Sedang dikerjakan:** Seeder untuk semua menu — **SELESAI** (commit `6024b88`)
+- **Sedang dikerjakan:** Fix seeder idempotent — **SELESAI**
 - **File yang dimodifikasi:**
-  - `app/Models/Vehicle.php` — tambah `HasFactory`
-  - `database/factories/VehicleFactory.php` — factory baru motor Indonesia
-  - 11 seeders baru: Customer, Vehicle, Partner, SparepartCategory, Sparepart, Service, ProductBundle, Booking, Invoice, StockMovement, Order
-  - `database/seeders/DatabaseSeeder.php` — daftar semua seeder dengan urutan yang benar
-  - 4 alter migrations: tambah `Schema::hasTable()/hasColumn()` guard agar `migrate:fresh` tidak fail
-- **Cara pakai:** `php artisan migrate:fresh --seed`
+  - `database/seeders/DatabaseSeeder.php` — tambah truncate semua tabel (disable FK checks) sebelum seeding; sekarang `db:seed` bisa dijalankan berulang kali tanpa error
+- **Cara pakai:** `php artisan db:seed` (idempotent, truncate otomatis) ATAU `php artisan migrate:fresh --seed`
 - **Hasil seed:** 3 users · 15 customers · 21 vehicles · 5 partners · 22 categories · 26 spareparts · 15 services · 5 bundles · 10 bookings · 12 invoices · 11 work orders · 31 stock movements · 8 orders
 - **Tests:** 141 pass, 1 skip, 0 fail
 - **AI sebelumnya:** Claude
