@@ -19,11 +19,11 @@
 
 ## CURRENT SESSION
 
-- **Sedang dikerjakan:** Fix RFM cluster_label "Unknown" — **SELESAI**
+- **Sedang dikerjakan:** Dashboard gunakan data real dari DB — **SELESAI**
 - **File yang dimodifikasi:**
-  - `database/seeders/DatabaseSeeder.php` — tambah `ClusterDefinitionSeeder` (terlewat sebelumnya); truncate `cluster_definitions` juga
-- **Cara pakai:** `php artisan db:seed && php artisan rfm:calculate`
-- **Hasil seed:** 3 users · 15 customers · 21 vehicles · 5 partners · 5 cluster definitions · 22 categories · 26 spareparts · 15 services · 5 bundles · 10 bookings · 12 invoices · 11 work orders · 31 stock movements · 8 orders
+  - `app/Livewire/Admin/Dashboard/AdminDashboard.php` — tambah query WO stats, revenue per bulan (chart), booking terbaru, RFM segmentasi, ganti `User::role=customer` → `Customer::count()`
+  - `resources/views/livewire/admin/dashboard/index.blade.php` — ganti semua hardcoded angka/tabel/chart dengan data real; SVG chart digenerate dari PHP; donut WO proporsional; tabel booking & stok dari DB; RFM bar dari cluster_rfm
+- **Cara pakai:** `php artisan db:seed && php artisan rfm:calculate` lalu buka `/admin/dashboard`
 - **Tests:** 141 pass, 1 skip, 0 fail
 - **AI sebelumnya:** Claude
 
