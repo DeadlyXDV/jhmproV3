@@ -93,6 +93,14 @@
         {{-- Tab: Kendaraan --}}
         @if($activeTab === 'vehicles')
         <div class="p-5">
+            <div class="flex items-center justify-between mb-4">
+                <p class="text-sm text-gray-500">{{ $customer->vehicles->count() }} kendaraan terdaftar</p>
+                <a wire:navigate href="{{ route('admin.vehicles.create', ['customer_id' => $customer->id]) }}"
+                   class="flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition">
+                    <x-heroicon-o-plus class="w-3.5 h-3.5" />
+                    Tambah Kendaraan
+                </a>
+            </div>
             @if($customer->vehicles->isEmpty())
             <p class="text-sm text-gray-400 text-center py-8">Belum ada kendaraan terdaftar</p>
             @else

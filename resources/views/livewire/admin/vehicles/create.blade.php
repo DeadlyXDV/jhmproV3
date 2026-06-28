@@ -57,11 +57,19 @@
                             <div class="md:col-span-2">
                                 <flux:field>
                                     <flux:label>Pemilik / Pelanggan <span class="text-red-500">*</span></flux:label>
-                                    <flux:select wire:model="customerId" placeholder="— Pilih pelanggan —">
-                                        @foreach($customers as $customer)
-                                        <option value="{{ $customer->id }}">{{ $customer->nama }}{{ $customer->no_hp ? ' ('.$customer->no_hp.')' : '' }}</option>
-                                        @endforeach
-                                    </flux:select>
+                                    @if($customerLocked)
+                                        @php $lockedCustomer = $customers->firstWhere('id', $customerId); @endphp
+                                        <div class="px-3 py-2 text-sm border border-gray-200 rounded-lg bg-gray-50 text-gray-700">
+                                            {{ $lockedCustomer?->nama ?? 'Pelanggan #'.$customerId }}
+                                        </div>
+                                        <input type="hidden" wire:model="customerId" />
+                                    @else
+                                        <flux:select wire:model="customerId" placeholder="— Pilih pelanggan —">
+                                            @foreach($customers as $customer)
+                                            <option value="{{ $customer->id }}">{{ $customer->nama }}{{ $customer->no_hp ? ' ('.$customer->no_hp.')' : '' }}</option>
+                                            @endforeach
+                                        </flux:select>
+                                    @endif
                                     <flux:error name="customerId" />
                                 </flux:field>
                             </div>

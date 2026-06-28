@@ -43,6 +43,8 @@ class VehicleCreate extends Component
     /** @var array<int, int|string> */
     public array $availableYears = [];
 
+    public bool $customerLocked = false;
+
     public function mount(?Vehicle $vehicle = null): void
     {
         $this->availableMerks = Vehicle::whereNull('deleted_at')
@@ -69,6 +71,9 @@ class VehicleCreate extends Component
             $this->reloadModels();
             $this->reloadTipes();
             $this->reloadYears();
+        } elseif ($fromCustomerId = request()->query('customer_id')) {
+            $this->customerId = (string) $fromCustomerId;
+            $this->customerLocked = true;
         }
     }
 
@@ -134,11 +139,16 @@ class VehicleCreate extends Component
         if ($this->vehicleId) {
             Vehicle::findOrFail($this->vehicleId)->update($data);
             session()->flash('success', 'Data kendaraan berhasil diperbarui.');
-            $this->redirect(route('admin.vehicles.show', $this->vehicleId));
+            $this->redirect(route('admin.vehicles.show', $this->vehicleId), navigate: true);
         } else {
             $vehicle = Vehicle::create($data);
             session()->flash('success', 'Kendaraan berhasil ditambahkan.');
-            $this->redirect(route('admin.vehicles.show', $vehicle));
+
+            if ($this->customerLocked) {
+                $this->redirect(route('admin.customers.show', $vehicle->customer_id), navigate: true);
+            } else {
+                $this->redirect(route('admin.vehicles.show', $vehicle), navigate: true);
+            }
         }
     }
 
