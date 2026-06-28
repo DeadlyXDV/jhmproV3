@@ -19,13 +19,25 @@
 
 ## CURRENT SESSION
 
-- **Sedang dikerjakan:** Dashboard gunakan data real dari DB — **SELESAI**
-- **File yang dimodifikasi:**
-  - `app/Livewire/Admin/Dashboard/AdminDashboard.php` — tambah query WO stats, revenue per bulan (chart), booking terbaru, RFM segmentasi, ganti `User::role=customer` → `Customer::count()`
-  - `resources/views/livewire/admin/dashboard/index.blade.php` — ganti semua hardcoded angka/tabel/chart dengan data real; SVG chart digenerate dari PHP; donut WO proporsional; tabel booking & stok dari DB; RFM bar dari cluster_rfm
-- **Cara pakai:** `php artisan db:seed && php artisan rfm:calculate` lalu buka `/admin/dashboard`
-- **Tests:** 141 pass, 1 skip, 0 fail
-- **AI sebelumnya:** Claude
+- **Sedang dikerjakan:** Backend follow-up dari pekerjaan Antigravity — semua 5 tugas **SELESAI** di session ini (Claude, 2026-06-29)
+- **File yang dimodifikasi (Claude, 2026-06-29):**
+  - `app/Livewire/Admin/Partners/PartnerCreate.php` (baru)
+  - `app/Livewire/Admin/Services/ServiceCreate.php` (baru)
+  - `app/Livewire/Admin/SparepartCategories/SparepartCategoryCreate.php` (baru)
+  - `app/Livewire/Admin/Spareparts/SparepartCreate.php` (baru)
+  - `app/Livewire/Admin/ProductBundles/ProductBundleCreate.php` (baru)
+  - `routes/web.php` — routes create/edit untuk 5 modul di atas
+  - `app/Livewire/Admin/Users/UserIndex.php` — tambah openUserCreate/Edit/saveUser/cancelUserForm + form inline
+  - `resources/views/livewire/admin/users/index.blade.php` — wire tombol Tambah + form inline + tombol Edit
+  - `app/Livewire/Admin/Bookings/BookingIndex.php` — tambah openBookingCreate/saveBooking/cancelBookingForm
+  - `resources/views/livewire/admin/bookings/index.blade.php` — tombol Booking Manual + form inline
+  - `app/Livewire/Admin/Invoices/InvoiceDetail.php` — tambah voidInvoice() + DB::transaction
+  - `resources/views/livewire/admin/invoices/detail.blade.php` — tombol Void Invoice (super_admin only)
+  - `database/migrations/2026_06_28_175750_alter_invoices_add_voided_payment_status.php` (baru)
+  - `app/Livewire/Admin/Vehicles/VehicleCreate.php` — support customer_id query param + customerLocked
+  - `resources/views/livewire/admin/vehicles/create.blade.php` — customer read-only saat locked
+  - `resources/views/livewire/admin/customers/detail.blade.php` — tombol Tambah Kendaraan di tab Kendaraan
+- **AI sebelumnya:** Gemini (Antigravity) → Claude (session ini)
 
 ---
 
