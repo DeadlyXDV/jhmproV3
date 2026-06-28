@@ -10,14 +10,19 @@ use App\Livewire\Admin\Invoices\InvoiceCreate;
 use App\Livewire\Admin\Invoices\InvoiceDetail;
 use App\Livewire\Admin\Invoices\InvoiceIndex;
 use App\Livewire\Admin\Orders\OrderIndex;
+use App\Livewire\Admin\Partners\PartnerCreate;
 use App\Livewire\Admin\Partners\PartnerIndex;
 use App\Livewire\Admin\Pos\PosPage;
+use App\Livewire\Admin\ProductBundles\ProductBundleCreate;
 use App\Livewire\Admin\ProductBundles\ProductBundleIndex;
 use App\Livewire\Admin\Reports\ReportIndex;
 use App\Livewire\Admin\Rfm\RfmIndex;
+use App\Livewire\Admin\Services\ServiceCreate;
 use App\Livewire\Admin\Services\ServiceIndex;
 use App\Livewire\Admin\Settings\SettingIndex;
+use App\Livewire\Admin\SparepartCategories\SparepartCategoryCreate;
 use App\Livewire\Admin\SparepartCategories\SparepartCategoryIndex;
+use App\Livewire\Admin\Spareparts\SparepartCreate;
 use App\Livewire\Admin\Spareparts\SparepartIndex;
 use App\Livewire\Admin\StockMovements\StockMovementIndex;
 use App\Livewire\Admin\Users\UserIndex;
@@ -67,6 +72,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Partner
         Route::get('/partners', PartnerIndex::class)->name('partners.index');
+        Route::get('/partners/create', PartnerCreate::class)->name('partners.create');
+        Route::get('/partners/{partner}/edit', PartnerCreate::class)->name('partners.edit');
 
         // Invoice
         Route::get('/invoices', InvoiceIndex::class)->name('invoices.index');
@@ -79,6 +86,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Servis
         Route::get('/services', ServiceIndex::class)->name('services.index');
+        Route::get('/services/create', ServiceCreate::class)->name('services.create');
+        Route::get('/services/{service}/edit', ServiceCreate::class)->name('services.edit');
 
         // Work Order
         Route::get('/work-orders', WorkOrderIndex::class)->name('work-orders.index');
@@ -86,13 +95,19 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Produk & Paket
         Route::get('/product-bundles', ProductBundleIndex::class)->name('product-bundles.index');
+        Route::get('/product-bundles/create', ProductBundleCreate::class)->name('product-bundles.create');
+        Route::get('/product-bundles/{productBundle}/edit', ProductBundleCreate::class)->name('product-bundles.edit');
 
         // Pengguna (semua role bisa lihat tapi edit hanya super_admin)
         Route::get('/users', UserIndex::class)->name('users.index');
 
         // Inventory
         Route::get('/spareparts', SparepartIndex::class)->name('spareparts.index');
+        Route::get('/spareparts/create', SparepartCreate::class)->name('spareparts.create');
+        Route::get('/spareparts/{sparepart}/edit', SparepartCreate::class)->name('spareparts.edit');
         Route::get('/sparepart-categories', SparepartCategoryIndex::class)->name('sparepart-categories.index');
+        Route::get('/sparepart-categories/create', SparepartCategoryCreate::class)->name('sparepart-categories.create');
+        Route::get('/sparepart-categories/{sparepartCategory}/edit', SparepartCategoryCreate::class)->name('sparepart-categories.edit');
         Route::get('/stock-movements', StockMovementIndex::class)->name('stock-movements.index');
 
         // Online Shop
