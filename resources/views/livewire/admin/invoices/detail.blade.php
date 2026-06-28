@@ -15,19 +15,37 @@
                 'paid'    => 'bg-green-100 text-green-700',
                 'partial' => 'bg-amber-100 text-amber-700',
                 'unpaid'  => 'bg-red-100 text-red-700',
+                'voided'  => 'bg-gray-200 text-gray-500 line-through',
                 default   => 'bg-gray-100 text-gray-500',
             };
             $payLabel = match($invoice->payment_status) {
                 'paid'    => 'Lunas',
                 'partial' => 'Sebagian',
                 'unpaid'  => 'Belum Bayar',
+                'voided'  => 'Void',
                 default   => $invoice->payment_status,
             };
         @endphp
-        <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium {{ $payColor }}">
-            {{ $payLabel }}
-        </span>
+        <div class="flex items-center gap-3">
+            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium {{ $payColor }}">
+                {{ $payLabel }}
+            </span>
+            @if(auth('admin')->user()?->isSuperAdmin() && $invoice->payment_status !== 'voided')
+            <button wire:click="voidInvoice"
+                    wire:confirm="Void invoice ini? Stok sparepart akan dikembalikan ke gudang dan tindakan ini tidak dapat dibatalkan."
+                    class="flex items-center gap-1.5 border border-red-300 text-red-600 hover:bg-red-50 text-xs font-medium px-3 py-1.5 rounded-lg transition">
+                <x-heroicon-o-x-circle class="w-3.5 h-3.5" />
+                Void Invoice
+            </button>
+            @endif
+        </div>
     </div>
+
+    @if(session('success'))
+    <div class="mb-4 px-4 py-3 bg-green-50 border border-green-200 text-green-700 text-sm rounded-lg">
+        {{ session('success') }}
+    </div>
+    @endif
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
