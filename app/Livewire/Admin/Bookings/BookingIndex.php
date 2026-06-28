@@ -17,6 +17,23 @@ class BookingIndex extends Component
 
     public string $filterSource = '';
 
+    // Form booking manual
+    public bool $showBookingForm = false;
+
+    public string $bNamaPemesan = '';
+
+    public string $bNoHp = '';
+
+    public string $bTanggal = '';
+
+    public string $bJamMulai = '';
+
+    public string $bSource = 'walk_in';
+
+    public string $bKeluhan = '';
+
+    public string $bCatatanAdmin = '';
+
     public function updatedSearch(): void
     {
         $this->resetPage();
@@ -30,6 +47,68 @@ class BookingIndex extends Component
     public function updatedFilterSource(): void
     {
         $this->resetPage();
+    }
+
+    public function openBookingCreate(): void
+    {
+        $this->resetBookingForm();
+        $this->bTanggal = now()->toDateString();
+        $this->showBookingForm = true;
+    }
+
+    public function saveBooking(): void
+    {
+        $this->validate([
+            'bNamaPemesan' => ['required', 'string', 'max:255'],
+            'bNoHp' => ['required', 'string', 'max:50'],
+            'bTanggal' => ['required', 'date', 'after_or_equal:today'],
+            'bSource' => ['required', 'in:whatsapp,walk_in'],
+            'bJamMulai' => ['nullable', 'date_format:H:i'],
+            'bKeluhan' => ['nullable', 'string', 'max:2000'],
+            'bCatatanAdmin' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        $lastNum = Booking::whereYear('created_at', now()->year)
+            ->orderByDesc('id')
+            ->value('booking_number');
+        $next = $lastNum
+            ? str_pad((int) substr($lastNum, -4) + 1, 4, '0', STR_PAD_LEFT)
+            : '0001';
+        $bookingNumber = 'BK-'.now()->year.'-'.$next;
+
+        $booking = Booking::create([
+            'booking_number' => $bookingNumber,
+            'nama_pemesan' => $this->bNamaPemesan,
+            'no_hp_pemesan' => $this->bNoHp,
+            'tanggal_booking' => $this->bTanggal,
+            'jam_mulai' => $this->bJamMulai ?: null,
+            'source' => $this->bSource,
+            'status' => 'confirmed',
+            'confirmed_at' => now(),
+            'keluhan' => $this->bKeluhan ?: null,
+            'catatan_admin' => $this->bCatatanAdmin ?: null,
+        ]);
+
+        session()->flash('success', "Booking #{$booking->booking_number} berhasil dibuat.");
+        $this->resetBookingForm();
+    }
+
+    public function cancelBookingForm(): void
+    {
+        $this->resetBookingForm();
+    }
+
+    private function resetBookingForm(): void
+    {
+        $this->showBookingForm = false;
+        $this->bNamaPemesan = '';
+        $this->bNoHp = '';
+        $this->bTanggal = '';
+        $this->bJamMulai = '';
+        $this->bSource = 'walk_in';
+        $this->bKeluhan = '';
+        $this->bCatatanAdmin = '';
+        $this->resetValidation();
     }
 
     public function confirm(int $id): void
