@@ -144,6 +144,13 @@ test('customer dengan lebih banyak transaksi mendapat f_score lebih tinggi', fun
     $low = CustomerRfm::where('customer_id', $customerLow->id)->where('source', 'bengkel')->first();
 
     expect($high->f_score)->toBeGreaterThanOrEqual($low->f_score);
+
+    // B.1: semua skor r/f/m harus berada di rentang 1–5 inklusif
+    foreach ([$high, $low] as $rfm) {
+        expect($rfm->r_score)->toBeGreaterThanOrEqual(1)->toBeLessThanOrEqual(5);
+        expect($rfm->f_score)->toBeGreaterThanOrEqual(1)->toBeLessThanOrEqual(5);
+        expect($rfm->m_score)->toBeGreaterThanOrEqual(1)->toBeLessThanOrEqual(5);
+    }
 });
 
 test('customer lebih baru mendapat r_score lebih tinggi', function () {
@@ -172,6 +179,13 @@ test('customer lebih baru mendapat r_score lebih tinggi', function () {
     $oldRfm = CustomerRfm::where('customer_id', $old->id)->where('source', 'bengkel')->first();
 
     expect($recentRfm->r_score)->toBeGreaterThanOrEqual($oldRfm->r_score);
+
+    // B.1: semua skor r/f/m harus berada di rentang 1–5 inklusif
+    foreach ([$recentRfm, $oldRfm] as $rfm) {
+        expect($rfm->r_score)->toBeGreaterThanOrEqual(1)->toBeLessThanOrEqual(5);
+        expect($rfm->f_score)->toBeGreaterThanOrEqual(1)->toBeLessThanOrEqual(5);
+        expect($rfm->m_score)->toBeGreaterThanOrEqual(1)->toBeLessThanOrEqual(5);
+    }
 });
 
 test('cluster_id merujuk ke ClusterDefinition yang valid', function () {
@@ -190,4 +204,29 @@ test('cluster_id merujuk ke ClusterDefinition yang valid', function () {
     $rfm = CustomerRfm::where('customer_id', $customer->id)->where('source', 'bengkel')->first();
 
     expect(ClusterDefinition::find($rfm->cluster_id))->not->toBeNull();
+});
+
+// B.2: pelanggan tanpa invoice sama sekali tidak boleh masuk kalkulasi RFM
+test('pelanggan tanpa transaksi tidak mendapat baris customer_rfm dan tidak menyebabkan error', function () {
+    // Buat pelanggan tanpa satu pun invoice
+    $customerNoTxn = Customer::factory()->create();
+
+    // Buat pelanggan lain dengan invoice agar command tidak skip karena data kosong total
+    $customerWithTxn = Customer::factory()->create();
+    $adminUser = User::factory()->admin()->create();
+
+    Invoice::factory()->paid()->create([
+        'customer_id' => $customerWithTxn->id,
+        'user_id' => $adminUser->id,
+        'tipe' => 'walk_in',
+        'tanggal' => now()->subDays(5)->toDateString(),
+    ]);
+
+    $this->artisan('rfm:calculate --source=bengkel')->assertSuccessful();
+
+    // Pelanggan tanpa transaksi tidak boleh punya baris customer_rfm
+    expect(CustomerRfm::where('customer_id', $customerNoTxn->id)->exists())->toBeFalse();
+
+    // Pelanggan dengan transaksi tetap terproses normal
+    expect(CustomerRfm::where('customer_id', $customerWithTxn->id)->exists())->toBeTrue();
 });

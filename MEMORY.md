@@ -19,25 +19,13 @@
 
 ## CURRENT SESSION
 
-- **Sedang dikerjakan:** Backend follow-up dari pekerjaan Antigravity — semua 5 tugas **SELESAI** di session ini (Claude, 2026-06-29)
-- **File yang dimodifikasi (Claude, 2026-06-29):**
-  - `app/Livewire/Admin/Partners/PartnerCreate.php` (baru)
-  - `app/Livewire/Admin/Services/ServiceCreate.php` (baru)
-  - `app/Livewire/Admin/SparepartCategories/SparepartCategoryCreate.php` (baru)
-  - `app/Livewire/Admin/Spareparts/SparepartCreate.php` (baru)
-  - `app/Livewire/Admin/ProductBundles/ProductBundleCreate.php` (baru)
-  - `routes/web.php` — routes create/edit untuk 5 modul di atas
-  - `app/Livewire/Admin/Users/UserIndex.php` — tambah openUserCreate/Edit/saveUser/cancelUserForm + form inline
-  - `resources/views/livewire/admin/users/index.blade.php` — wire tombol Tambah + form inline + tombol Edit
-  - `app/Livewire/Admin/Bookings/BookingIndex.php` — tambah openBookingCreate/saveBooking/cancelBookingForm
-  - `resources/views/livewire/admin/bookings/index.blade.php` — tombol Booking Manual + form inline
-  - `app/Livewire/Admin/Invoices/InvoiceDetail.php` — tambah voidInvoice() + DB::transaction
-  - `resources/views/livewire/admin/invoices/detail.blade.php` — tombol Void Invoice (super_admin only)
-  - `database/migrations/2026_06_28_175750_alter_invoices_add_voided_payment_status.php` (baru)
-  - `app/Livewire/Admin/Vehicles/VehicleCreate.php` — support customer_id query param + customerLocked
-  - `resources/views/livewire/admin/vehicles/create.blade.php` — customer read-only saat locked
-  - `resources/views/livewire/admin/customers/detail.blade.php` — tombol Tambah Kendaraan di tab Kendaraan
-- **AI sebelumnya:** Gemini (Antigravity) → Claude (session ini)
+- **Sedang dikerjakan:** Test plan RFM & K-Means untuk Tugas Akhir
+- **File yang dimodifikasi (Claude, 2026-06-30):**
+  - `tests/Feature/RfmKMeansBoundaryTest.php` — BARU: 4 test K-Means boundary value (n<k, n=k, n>k) + ranking cluster (A1+A2)
+  - `tests/Feature/CalculateRfmCommandTest.php` — Tambah range assertion skor 1-5 (B.1) + test pelanggan 0 transaksi (B.2)
+  - `tests/Feature/AdminRfmIndexTest.php` — Tambah empty state test (B.3)
+- **Total test:** 148 pass, 1 skip, 0 fail (sebelumnya 127 pass)
+- **AI sebelumnya:** Claude → Gemini (Antigravity) → Claude (session ini)
 
 ---
 
@@ -419,6 +407,7 @@ Semua halaman ini belum dibuat sama sekali. Guard `web`, Livewire + Tailwind.
 | Status | Komponen | Deskripsi | Ditemukan di commit |
 |---|---|---|---|
 | 🔍 Perlu verifikasi | UserIndex | Toggle active hanya diproteksi di server-side; pastikan UI tidak render tombol untuk non-super_admin | `77c3f8f` |
+| 🔍 Perlu verifikasi | tests/Browser/sidebar.spec.js | Assert `active state styling` gagal karena ekspresi reguler `/bg-\\[#E11D22\\]/` mencari literal backslash di string class, padahal class di DOM adalah `bg-[#E11D22]`. | `2026-06-29` |
 | ✅ Fixed | PartnerIndex | Tambah Create/Edit inline form — openCreate/openEdit/save/cancelForm | 2026-06-17 |
 | ✅ Fixed | SparepartIndex | Tambah Create/Edit inline form — semua field kecuali images/dimensi; SKU auto-uppercase | 2026-06-17 |
 | ✅ Fixed | CustomerRfm | Tabel DB bernama `customer_rfm` (singular) — sudah ditambahkan `$table = 'customer_rfm'` di model | session 2026-06-15 |

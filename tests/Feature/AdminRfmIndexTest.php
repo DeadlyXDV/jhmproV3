@@ -51,3 +51,15 @@ test('halaman rfm menampilkan stat cards', function () {
         ->assertSee('Total Customer')
         ->assertSee('Avg. Monetary');
 });
+
+// B.3: empty state — halaman tetap 200 OK dan menampilkan pesan kosong
+// ketika tabel customer_rfm benar-benar kosong (kondisi awal sebelum rfm:calculate dijalankan)
+test('halaman rfm tetap 200 OK dan menampilkan empty state ketika belum ada data RFM', function () {
+    $superAdmin = User::factory()->superAdmin()->create();
+
+    // RefreshDatabase memastikan customer_rfm kosong — tidak perlu truncate manual
+    $this->actingAs($superAdmin, 'admin')
+        ->get(route('admin.rfm.index'))
+        ->assertOk()
+        ->assertSee('Belum ada data RFM untuk sumber ini');
+});
