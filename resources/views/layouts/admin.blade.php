@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'Admin' }} — JHMPro</title>
+    @fonts
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
-<body class="h-full bg-[#F3F4F6] font-[Inter,ui-sans-serif,system-ui]"
+<body class="h-full bg-[#F3F4F6] font-sans"
     x-data="{ 
         collapsed: localStorage.getItem('sidebar-collapsed') === 'true',
         toggle() {
@@ -38,21 +39,29 @@
         <nav class="flex-1 overflow-y-auto py-2 space-y-1 custom-scrollbar"
             :class="collapsed ? 'px-2' : 'px-4'">
 
+            <x-admin.nav-item
+                href="{{ route('admin.dashboard') }}"
+                icon="o-home"
+                :active="request()->routeIs('admin.dashboard*')"
+            >
+                Dashboard
+            </x-admin.nav-item>
+
             @php
                 $menuGroups = [
-                    'MENU' => [
-                        ['route' => 'admin.dashboard', 'icon' => 'o-home', 'label' => 'Dashboard', 'base' => 'admin.dashboard'],
+                    'OPERASIONAL' => [
+                        ['route' => 'admin.work-orders.index', 'icon' => 'o-clipboard-document-list', 'label' => 'Work Order', 'base' => 'admin.work-orders'],
+                        ['route' => 'admin.bookings.index', 'icon' => 'o-calendar', 'label' => 'Booking', 'base' => 'admin.bookings'],
+                        ['route' => 'admin.invoices.index', 'icon' => 'o-document-text', 'label' => 'Invoice', 'base' => 'admin.invoices'],
+                    ],
+                    'DATA MASTER' => [
                         ['route' => 'admin.customers.index', 'icon' => 'o-users', 'label' => 'Pelanggan', 'base' => 'admin.customers'],
                         ['route' => 'admin.vehicles.index', 'icon' => 'o-truck', 'label' => 'Kendaraan', 'base' => 'admin.vehicles'],
-                        ['route' => 'admin.invoices.index', 'icon' => 'o-document-text', 'label' => 'Invoice', 'base' => 'admin.invoices'],
-                        ['route' => 'admin.bookings.index', 'icon' => 'o-calendar', 'label' => 'Booking', 'base' => 'admin.bookings'],
                         ['route' => 'admin.services.index', 'icon' => 'o-sun', 'label' => 'Servis', 'base' => 'admin.services'],
-                        ['route' => 'admin.work-orders.index', 'icon' => 'o-clipboard-document-list', 'label' => 'Work Order', 'base' => 'admin.work-orders'],
-                        ['route' => 'admin.partners.index', 'icon' => 'o-building-office-2', 'label' => 'Partner', 'base' => 'admin.partners'],
                         ['route' => 'admin.product-bundles.index', 'icon' => 'o-cube', 'label' => 'Paket Produk', 'base' => 'admin.product-bundles'],
-                        ['route' => 'admin.users.index', 'icon' => 'o-user', 'label' => 'Pengguna', 'base' => 'admin.users'],
+                        ['route' => 'admin.partners.index', 'icon' => 'o-building-office-2', 'label' => 'Partner', 'base' => 'admin.partners'],
                     ],
-                    'INVENTORY' => [
+                    'INVENTORI' => [
                         ['route' => 'admin.spareparts.index', 'icon' => 'o-wrench', 'label' => 'Sparepart', 'base' => 'admin.spareparts'],
                         ['route' => 'admin.sparepart-categories.index', 'icon' => 'o-tag', 'label' => 'Kategori', 'base' => 'admin.sparepart-categories'],
                         ['route' => 'admin.stock-movements.index', 'icon' => 'o-arrows-right-left', 'label' => 'Stok', 'base' => 'admin.stock-movements'],
@@ -60,19 +69,24 @@
                 ];
 
                 if (auth('admin')->user()?->isSuperAdmin()) {
-                    $menuGroups['ANALITIK'] = [
-                        ['route' => 'admin.orders.index', 'icon' => 'o-shopping-bag', 'label' => 'Orders', 'base' => 'admin.orders'],
-                        ['route' => 'admin.rfm.index', 'icon' => 'o-chart-bar', 'label' => 'RFM', 'base' => 'admin.rfm'],
+                    $menuGroups['ANALITIK & LAPORAN'] = [
+                        // ['route' => 'admin.orders.index', 'icon' => 'o-shopping-bag', 'label' => 'Orders', 'base' => 'admin.orders'], // Di-hold karena online shop belum aktif
+                        ['route' => 'admin.rfm.index', 'icon' => 'o-chart-pie', 'label' => 'Segmentasi Pelanggan', 'base' => 'admin.rfm'],
                         ['route' => 'admin.reports.index', 'icon' => 'o-banknotes', 'label' => 'Laporan', 'base' => 'admin.reports'],
-                        ['route' => 'admin.settings.index', 'icon' => 'o-cog-6-tooth', 'label' => 'Pengaturan', 'base' => 'admin.settings'],
                     ];
+                }
+
+                $menuGroups['SISTEM'] = [
+                    ['route' => 'admin.users.index', 'icon' => 'o-user', 'label' => 'Pengguna', 'base' => 'admin.users'],
+                ];
+                if (auth('admin')->user()?->isSuperAdmin()) {
+                    $menuGroups['SISTEM'][] = ['route' => 'admin.settings.index', 'icon' => 'o-cog-6-tooth', 'label' => 'Pengaturan', 'base' => 'admin.settings'];
                 }
             @endphp
 
             @foreach($menuGroups as $group => $items)
                 <p x-show="!collapsed" x-cloak
-                    class="mb-2 text-[11px] font-bold uppercase tracking-wider text-gray-500 whitespace-nowrap overflow-hidden px-2"
-                    :class="{{ $loop->first ? "'mt-0'" : "'mt-8'" }}">
+                    class="mb-2 text-[11px] font-bold uppercase tracking-wider text-gray-500 whitespace-nowrap overflow-hidden px-2 mt-5">
                     {{ $group }}
                 </p>
 
@@ -116,24 +130,19 @@
                 <h1 class="text-xl font-bold text-gray-900 tracking-tight">{{ $title ?? 'Dashboard' }}</h1>
             </div>
 
-            {{-- Search Bar --}}
-            <div class="hidden lg:flex items-center flex-1 max-w-md relative group">
-                <x-heroicon-o-magnifying-glass class="w-4 h-4 absolute left-4 text-gray-400 group-focus-within:text-red-500 transition-colors" />
-                <input type="text"
-                    placeholder="Cari booking, sparepart, pelanggan"
-                    class="w-full bg-gray-100 border-none rounded-xl py-2.5 pl-11 pr-14 text-sm focus:ring-2 focus:ring-red-500/20 placeholder:text-gray-400">
-                <div class="absolute right-3 px-1.5 py-0.5 bg-white border border-gray-200 rounded text-[10px] font-medium text-gray-400 flex items-center gap-0.5">
-                    <span class="text-xs">⌘</span>K
-                </div>
-            </div>
-
+            {{-- Spacer --}}
+            <div class="flex-1"></div>
+ 
             {{-- Right side --}}
             <div class="flex items-center gap-5">
                 {{-- Actions --}}
-                <div class="flex items-center gap-2">
-                    <button class="p-2 text-gray-400 hover:bg-gray-50 rounded-full transition-colors cursor-pointer">
-                        <x-heroicon-o-moon class="w-5 h-5" />
-                    </button>
+                <div class="flex items-center gap-3">
+                    <a wire:navigate href="{{ route('admin.pos') }}"
+                       class="flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition shadow-md shadow-red-600/10 cursor-pointer">
+                        <x-heroicon-o-calculator class="w-4 h-4" />
+                        <span class="hidden sm:inline">Kasir POS</span>
+                    </a>
+
                     <button class="p-2 text-gray-400 hover:bg-gray-50 rounded-full transition-colors relative cursor-pointer">
                         <x-heroicon-o-bell class="w-5 h-5" />
                         <span class="absolute top-2 right-2.5 w-2 h-2 bg-red-500 border-2 border-white rounded-full"></span>
@@ -158,20 +167,13 @@
                     <div x-show="open" @click.outside="open = false" x-cloak
                         class="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50">
 
-                        @if(auth('admin')->user()?->isAdmin())
-                        <a href="{{ route('admin.pos') }}" wire:navigate
-                            class="flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-white bg-red-600 mx-2 mb-2 rounded-xl shadow-lg shadow-red-600/20 hover:bg-red-700 transition-colors">
-                            <x-heroicon-o-calculator class="w-5 h-5" />
-                            Buka Kasir POS
-                        </a>
-                        <div class="border-t border-gray-100 my-2"></div>
-                        @endif
-
+                        @if(auth('admin')->user()?->isSuperAdmin())
                         <a href="{{ route('admin.settings.index') }}" wire:navigate
                             class="flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900">
                             <x-heroicon-o-cog-6-tooth class="w-5 h-5 text-gray-400" />
                             Pengaturan Profil
                         </a>
+                        @endif
 
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf

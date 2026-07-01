@@ -55,6 +55,137 @@
         </div>
     @endif
 
+    {{-- Analitik Cluster K-Means --}}
+    @if($clusters->isNotEmpty())
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
+            <div class="flex items-center gap-2 mb-5">
+                <x-heroicon-o-cpu-chip class="w-5 h-5 text-gray-400" />
+                <h3 class="text-sm font-semibold text-gray-700">Analitik Cluster K-Means</h3>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                @foreach($clusters as $cluster)
+                    @php $stat = $clusterAnalytics->get($cluster->label); @endphp
+                    <div class="rounded-xl border-2 p-4" style="border-color: {{ $cluster->color_hex }}33; background-color: {{ $cluster->color_hex }}08">
+                        {{-- Header --}}
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full flex-none" style="background-color: {{ $cluster->color_hex }}"></span>
+                                <span class="text-sm font-bold" style="color: {{ $cluster->color_hex }}">{{ $cluster->label }}</span>
+                            </div>
+                            <span class="text-xs font-bold px-2 py-0.5 rounded-full"
+                                style="background-color: {{ $cluster->color_hex }}22; color: {{ $cluster->color_hex }}">
+                                {{ $stat?->total ?? 0 }}
+                            </span>
+                        </div>
+
+                        {{-- Centroid K-Means --}}
+                        <div class="mb-3 p-2.5 rounded-lg bg-white/70">
+                            <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Centroid K-Means</p>
+                            <div class="grid grid-cols-3 gap-1 text-center">
+                                @foreach(['R', 'F', 'M'] as $i => $dim)
+                                    <div>
+                                        <p class="text-[10px] text-gray-400">{{ $dim }}</p>
+                                        <p class="text-sm font-bold text-gray-800">
+                                            {{ $cluster->centroid ? number_format($cluster->centroid[$i], 2) : '—' }}
+                                        </p>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        {{-- Avg Stats --}}
+                        <div class="space-y-1.5 mb-3 text-xs">
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Avg Recency</span>
+                                <span class="font-semibold text-gray-700">{{ $stat ? number_format($stat->avg_recency, 0).' hari' : '—' }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Avg Frequency</span>
+                                <span class="font-semibold text-gray-700">{{ $stat ? number_format($stat->avg_freq, 1).'x' : '—' }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Avg Monetary</span>
+                                <span class="font-semibold text-gray-700">Rp {{ $stat ? number_format($stat->avg_monetary, 0, ',', '.') : '—' }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Avg R/F/M</span>
+                                <span class="font-semibold text-gray-700">
+                                    {{ $stat ? $stat->avg_r.'/'.$stat->avg_f.'/'.$stat->avg_m : '—' }}
+                                </span>
+                            </div>
+                        </div>
+
+                        {{-- Action Suggestion --}}
+                        @if($cluster->action_suggestion)
+                            <div class="pt-2 border-t border-gray-100">
+                                <p class="text-[10px] text-gray-500 italic leading-relaxed">{{ $cluster->action_suggestion }}</p>
+                            </div>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
+    {{-- Tren Segmentasi per Bulan --}}
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-6">
+        <div class="flex items-center gap-2 px-6 py-4 border-b border-gray-100">
+            <x-heroicon-o-arrow-trending-up class="w-5 h-5 text-gray-400" />
+            <h3 class="text-sm font-semibold text-gray-700">Tren Segmentasi per Bulan</h3>
+        </div>
+        @if($trendMonths->isEmpty())
+            <div class="px-6 py-10 text-center">
+                <x-heroicon-o-calendar-days class="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                <p class="text-gray-400 text-sm">Belum ada data historis</p>
+                <p class="text-gray-400 text-xs mt-1">Jalankan <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs font-mono">rfm:calculate</code> untuk mengisi tren</p>
+            </div>
+        @else
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-gray-100 bg-gray-50/50">
+                            <th class="text-left px-6 py-3 font-semibold text-gray-600 whitespace-nowrap">Bulan</th>
+                            @foreach($clusters as $cluster)
+                                <th class="text-center px-4 py-3 font-semibold whitespace-nowrap"
+                                    style="color: {{ $cluster->color_hex }}">
+                                    {{ $cluster->label }}
+                                </th>
+                            @endforeach
+                            <th class="text-center px-4 py-3 font-semibold text-gray-600">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        @foreach($trendMonths as $yearMonth => $items)
+                            @php
+                                $monthData = $items->pluck('total', 'cluster_label');
+                                $monthTotal = $monthData->sum();
+                            @endphp
+                            <tr class="hover:bg-gray-50/50 transition-colors">
+                                <td class="px-6 py-3 font-medium text-gray-700 whitespace-nowrap">
+                                    {{ \Carbon\Carbon::createFromFormat('Y-m', $yearMonth)->format('M Y') }}
+                                </td>
+                                @foreach($clusters as $cluster)
+                                    @php $count = $monthData->get($cluster->label, 0); @endphp
+                                    <td class="px-4 py-3 text-center">
+                                        @if($count > 0)
+                                            <span class="inline-flex items-center justify-center min-w-[2rem] px-2 py-0.5 rounded text-xs font-bold"
+                                                style="background-color: {{ $cluster->color_hex }}22; color: {{ $cluster->color_hex }}">
+                                                {{ $count }}
+                                            </span>
+                                        @else
+                                            <span class="text-gray-300 text-xs">—</span>
+                                        @endif
+                                    </td>
+                                @endforeach
+                                <td class="px-4 py-3 text-center font-semibold text-gray-700">{{ $monthTotal }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @endif
+    </div>
+
     {{-- Table --}}
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">

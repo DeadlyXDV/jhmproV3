@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Rfm;
 
 use App\Models\ClusterDefinition;
 use App\Models\CustomerRfm;
+use App\Models\RfmHistory;
 use Illuminate\View\View;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -90,6 +91,27 @@ class RfmIndex extends Component
 
         $latestCalculatedAt = (clone $baseQuery)->max('calculated_at');
 
+        $clusterAnalytics = CustomerRfm::query()
+            ->where('source', $this->activeSource)
+            ->selectRaw('cluster_id, cluster_label,
+                count(*) as total,
+                round(avg(r_score), 2) as avg_r,
+                round(avg(f_score), 2) as avg_f,
+                round(avg(m_score), 2) as avg_m,
+                round(avg(recency_days), 1) as avg_recency,
+                round(avg(frequency), 1) as avg_freq,
+                round(avg(monetary), 2) as avg_monetary')
+            ->groupBy('cluster_id', 'cluster_label')
+            ->get()
+            ->keyBy('cluster_label');
+
+        $trendMonths = RfmHistory::where('source', $this->activeSource)
+            ->selectRaw('year_month, cluster_label, count(*) as total')
+            ->groupBy('year_month', 'cluster_label')
+            ->orderBy('year_month')
+            ->get()
+            ->groupBy('year_month');
+
         $rows = (clone $baseQuery)
             ->when($this->filterCluster, fn ($q) => $q->where('cluster_label', $this->filterCluster))
             ->when($this->search, function ($q) {
@@ -99,7 +121,8 @@ class RfmIndex extends Component
             ->paginate(20);
 
         return view('livewire.admin.rfm.index', compact(
-            'clusters', 'stats', 'clusterStats', 'latestCalculatedAt', 'rows'
-        ))->layout('layouts.admin', ['title' => 'Segmentasi RFM']);
+            'clusters', 'stats', 'clusterStats', 'latestCalculatedAt', 'rows',
+            'clusterAnalytics', 'trendMonths'
+        ))->layout('layouts.admin', ['title' => 'Segmentasi Pelanggan']);
     }
 }

@@ -19,17 +19,14 @@
 
 ## CURRENT SESSION
 
-- **Sedang dikerjakan:** Test plan RFM & K-Means untuk Tugas Akhir — NFR tests selesai
+- **Sedang dikerjakan:** Analitik K-Means di halaman Segmentasi Pelanggan — selesai
 - **File yang dimodifikasi (Claude, 2026-07-01):**
-  - `tests/Feature/RfmKMeansBoundaryTest.php` — BARU: 4 test K-Means boundary value (n<k, n=k, n>k) + ranking cluster (A1+A2)
-  - `tests/Feature/CalculateRfmCommandTest.php` — Tambah range assertion skor 1-5 (B.1) + test pelanggan 0 transaksi (B.2)
-  - `tests/Feature/AdminRfmIndexTest.php` — Tambah empty state test (B.3)
-  - `tests/Feature/RfmPerformanceTest.php` — BARU (2026-07-01): 8 NFR test (PERF-001, STRESS-001a/b/c, ENDR-001, REL-001, SEC-001a/b)
+  - `tests/Feature/RfmPerformanceTest.php` — BARU: 8 NFR test (PERF, STRESS, ENDR, REL, SEC)
+  - `app/Livewire/Admin/Rfm/RfmIndex.php` — tambah query clusterAnalytics + trendMonths, title diubah
+  - `resources/views/livewire/admin/rfm/index.blade.php` — tambah section Analitik Cluster K-Means + Tren Segmentasi per Bulan
+  - `resources/views/layouts/admin.blade.php` — rename menu "RFM" → "Segmentasi Pelanggan", icon → o-chart-pie
 - **Total test:** 155 pass, 1 skip, 0 fail
 - **AI sebelumnya:** Claude → Gemini (Antigravity) → Claude (session ini)
-- **NFR gap dilaporkan:**
-  - Rate limiting: tidak ada throttle middleware di route `/rfm` (hanya login yang di-throttle via Fortify)
-  - Data isolation: tidak ada multi-tenancy, isolasi hanya di level role (bukan per-user/tenant) — test dianggap tidak relevan
 
 ---
 
