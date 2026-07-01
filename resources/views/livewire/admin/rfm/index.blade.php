@@ -72,6 +72,7 @@
                 <span class="text-xs text-gray-400">Sumbu X = Recency Score (R) &middot; Sumbu Y = Frequency Score (F)</span>
             </div>
             <div wire:key="scatter-{{ $activeSource }}"
+                 wire:ignore
                  x-data="{
                      init() {
                          new Chart(this.$refs.canvas, {
