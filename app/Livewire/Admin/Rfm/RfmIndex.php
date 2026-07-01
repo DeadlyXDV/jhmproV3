@@ -106,7 +106,7 @@ class RfmIndex extends Component
             ->keyBy('cluster_label');
 
         $trendMonths = RfmHistory::where('source', $this->activeSource)
-            ->selectRaw('year_month, cluster_label, count(*) as total')
+            ->selectRaw('`year_month`, `cluster_label`, count(*) as total')
             ->groupBy('year_month', 'cluster_label')
             ->orderBy('year_month')
             ->get()
