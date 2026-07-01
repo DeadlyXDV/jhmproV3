@@ -1,4 +1,10 @@
 <div>
+    @assets
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"
+            integrity="sha384-e6nUZLBkQ86NJ6TVVKAeSaK8jWa3NhkYWZFomE39AvDbQWeie9PlQqM3pmYW5d1g"
+            crossorigin="anonymous"></script>
+    @endassets
+
     {{-- Source Tabs --}}
     <div class="flex gap-1 mb-6 bg-white rounded-2xl border border-gray-100 p-1 w-fit shadow-sm">
         @foreach(['bengkel' => 'Bengkel', 'online' => 'Online Shop', 'combined' => 'Combined'] as $key => $label)
@@ -51,6 +57,61 @@
                         </span>
                     </button>
                 @endforeach
+            </div>
+        </div>
+    @endif
+
+    {{-- Visualisasi Scatter Plot K-Means --}}
+    @if($stats['total'] > 0)
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2">
+                    <x-heroicon-o-chart-bar class="w-5 h-5 text-gray-400" />
+                    <h3 class="text-sm font-semibold text-gray-700">Visualisasi Cluster K-Means</h3>
+                </div>
+                <span class="text-xs text-gray-400">Sumbu X = Recency Score (R) &middot; Sumbu Y = Frequency Score (F)</span>
+            </div>
+            <div wire:key="scatter-{{ $activeSource }}"
+                 x-data="{
+                     init() {
+                         new Chart(this.$refs.canvas, {
+                             type: 'scatter',
+                             data: { datasets: @js($scatterDatasets) },
+                             options: {
+                                 responsive: true,
+                                 maintainAspectRatio: false,
+                                 scales: {
+                                     x: {
+                                         min: 0.5, max: 5.5,
+                                         title: { display: true, text: 'Recency Score (R)', font: { size: 11 } },
+                                         ticks: { stepSize: 1, callback: (v) => ['', 'R1', 'R2', 'R3', 'R4', 'R5'][v] ?? v },
+                                         grid: { color: '#f3f4f6' }
+                                     },
+                                     y: {
+                                         min: 0.5, max: 5.5,
+                                         title: { display: true, text: 'Frequency Score (F)', font: { size: 11 } },
+                                         ticks: { stepSize: 1, callback: (v) => ['', 'F1', 'F2', 'F3', 'F4', 'F5'][v] ?? v },
+                                         grid: { color: '#f3f4f6' }
+                                     }
+                                 },
+                                 plugins: {
+                                     legend: {
+                                         position: 'bottom',
+                                         labels: { usePointStyle: true, padding: 20, font: { size: 12 } }
+                                     },
+                                     tooltip: {
+                                         callbacks: {
+                                             label: (ctx) => ` ${ctx.dataset.label}  —  R = ${ctx.raw.x}, F = ${ctx.raw.y}`
+                                         }
+                                     }
+                                 }
+                             }
+                         });
+                     }
+                 }">
+                <div style="height: 320px">
+                    <canvas x-ref="canvas"></canvas>
+                </div>
             </div>
         </div>
     @endif

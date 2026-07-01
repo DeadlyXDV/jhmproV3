@@ -91,6 +91,26 @@ class RfmIndex extends Component
 
         $latestCalculatedAt = (clone $baseQuery)->max('calculated_at');
 
+        $scatterPoints = CustomerRfm::where('source', $this->activeSource)
+            ->select('r_score', 'f_score', 'cluster_label')
+            ->inRandomOrder()
+            ->limit(500)
+            ->get()
+            ->groupBy('cluster_label')
+            ->map(fn ($group) => $group->map(fn ($row) => [
+                'x' => round($row->r_score + (rand(-28, 28) / 100), 2),
+                'y' => round($row->f_score + (rand(-28, 28) / 100), 2),
+            ])->values());
+
+        $scatterDatasets = $clusters->map(fn ($cluster) => [
+            'label' => $cluster->label,
+            'data' => ($scatterPoints->get($cluster->label) ?? collect())->toArray(),
+            'backgroundColor' => $cluster->color_hex.'bb',
+            'borderColor' => $cluster->color_hex,
+            'pointRadius' => 5,
+            'pointHoverRadius' => 8,
+        ])->values()->toArray();
+
         $clusterAnalytics = CustomerRfm::query()
             ->where('source', $this->activeSource)
             ->selectRaw('cluster_id, cluster_label,
@@ -122,7 +142,7 @@ class RfmIndex extends Component
 
         return view('livewire.admin.rfm.index', compact(
             'clusters', 'stats', 'clusterStats', 'latestCalculatedAt', 'rows',
-            'clusterAnalytics', 'trendMonths'
+            'clusterAnalytics', 'trendMonths', 'scatterDatasets'
         ))->layout('layouts.admin', ['title' => 'Segmentasi Pelanggan']);
     }
 }
