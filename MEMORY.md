@@ -19,13 +19,11 @@
 
 ## CURRENT SESSION
 
-- **Sedang dikerjakan:** Analitik K-Means di halaman Segmentasi Pelanggan — selesai
-- **File yang dimodifikasi (Claude, 2026-07-01):**
-  - `tests/Feature/RfmPerformanceTest.php` — BARU: 8 NFR test (PERF, STRESS, ENDR, REL, SEC)
-  - `app/Livewire/Admin/Rfm/RfmIndex.php` — tambah query clusterAnalytics + trendMonths, title diubah
-  - `resources/views/livewire/admin/rfm/index.blade.php` — tambah section Analitik Cluster K-Means + Tren Segmentasi per Bulan
-  - `resources/views/layouts/admin.blade.php` — rename menu "RFM" → "Segmentasi Pelanggan", icon → o-chart-pie
-- **Total test:** 155 pass, 1 skip, 0 fail
+- **Sedang dikerjakan:** Menyusun `Dokumentasi/laporan-detail.md` — bahan Bab III/IV/V laporan akademik (struktur DB, algoritma RFM & K-Means, routes, hasil test, evaluasi cluster, daftar screenshot) — selesai
+- **File yang dimodifikasi (Claude, 2026-07-08):**
+  - `Dokumentasi/laporan-detail.md` — BARU: dokumen teknis lengkap diverifikasi langsung dari kode (tidak ada perubahan kode aplikasi di sesi ini)
+- **Temuan yang perlu dicatat:** belum ada implementasi Elbow Method/Silhouette Score di kode (dikonfirmasi via grep); tidak ada foreign key constraint level DB di migration manapun (relasi murni logis via Eloquent); K-Means di `CalculateRfm.php` adalah implementasi manual PHP, tidak pakai php-ml/Rubix
+- **Total test:** 155 pass, 1 skip, 0 fail (432 assertion) — tidak berubah, tidak ada modifikasi kode
 - **AI sebelumnya:** Claude → Gemini (Antigravity) → Claude (session ini)
 
 ---
