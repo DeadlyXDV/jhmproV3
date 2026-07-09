@@ -19,11 +19,11 @@
 
 ## CURRENT SESSION
 
-- **Sedang dikerjakan:** Menyusun `Dokumentasi/laporan-detail.md` — bahan Bab III/IV/V laporan akademik (struktur DB, algoritma RFM & K-Means, routes, hasil test, evaluasi cluster, daftar screenshot) — selesai
-- **File yang dimodifikasi (Claude, 2026-07-08):**
-  - `Dokumentasi/laporan-detail.md` — BARU: dokumen teknis lengkap diverifikasi langsung dari kode (tidak ada perubahan kode aplikasi di sesi ini)
-- **Temuan yang perlu dicatat:** belum ada implementasi Elbow Method/Silhouette Score di kode (dikonfirmasi via grep); tidak ada foreign key constraint level DB di migration manapun (relasi murni logis via Eloquent); K-Means di `CalculateRfm.php` adalah implementasi manual PHP, tidak pakai php-ml/Rubix
-- **Total test:** 155 pass, 1 skip, 0 fail (432 assertion) — tidak berubah, tidak ada modifikasi kode
+- **Sedang dikerjakan:** Membuat `Dokumentasi/UML.md` — use case diagram, activity diagram, class diagram, ERD dalam PlantUML, 100% diverifikasi dari kode (models, migrations, routes, Livewire components, observers, console commands) — selesai
+- **File yang dimodifikasi (Claude, 2026-07-09):**
+  - `Dokumentasi/UML.md` — BARU: 1 use case diagram (dipecah 6 sub-diagram per modul, style oval putih polos garis hitam sesuai referensi user), 5 activity diagram (login, booking online, POS, work order, RFM/K-Means), 1 class diagram (25 model), 1 ERD (semua tabel migration)
+- **Temuan yang perlu dicatat:** tabel `motorcycles` di migration tidak punya Eloquent Model (legacy, digantikan `vehicles`); `work_orders.status` enum DB (`antrian|proses|selesai`) tidak sinkron dengan value yang dipakai Livewire (`pending|in_progress|done|cancelled`) — dicatat sebagai note di diagram, TIDAK diperbaiki (di luar scope dokumentasi)
+- **Total test:** tidak berubah, tidak ada modifikasi kode aplikasi di sesi ini
 - **AI sebelumnya:** Claude → Gemini (Antigravity) → Claude (session ini)
 
 ---
