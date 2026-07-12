@@ -22,3 +22,12 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# AI assistant configs & memory (local-only, not tracked)
+/.claude/
+/.agents/
+/.mcp.json
+/CLAUDE.md
+/GEMINI.md
+/AGENTS.md
+/MEMORY.md
